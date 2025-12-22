@@ -14,7 +14,7 @@
         }
         
         body { 
-            background: #000;
+            background:  #000;
             color: #fff;
             font-family: 'Share Tech Mono', 'Courier New', monospace;
             overflow-x: hidden;
@@ -46,8 +46,8 @@
             position: fixed;
             top:  0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(ellipse at center, transparent 30%, #000 100%);
-            pointer-events: none;
-            z-index: 9998;
+            pointer-events:  none;
+            z-index:  9998;
         }
         
         /* Header - Centered */
@@ -60,7 +60,7 @@
             box-shadow: 0 2px 0 #ff0000, 0 4px 20px rgba(255,0,0,0.2);
         }
         
-        .logo-wrap {
+        . logo-wrap {
             position: relative;
             width: 100px;
             height: 100px;
@@ -70,9 +70,9 @@
         
         .logo-wrap::before,
         .logo-wrap::after {
-            content: '';
+            content:  '';
             position: absolute;
-            border: 1px solid #ff0000;
+            border:  1px solid #ff0000;
         }
         
         .logo-wrap::before {
@@ -80,7 +80,7 @@
             animation: rotate 10s linear infinite;
         }
         
-        .logo-wrap::after {
+        .logo-wrap:: after {
             inset: -12px;
             animation: rotate 15s linear infinite reverse;
         }
@@ -90,21 +90,21 @@
             to { transform: rotate(360deg); }
         }
         
-        .logo-img {
+        . logo-img {
             width:  100%;
             height: 100%;
             object-fit:  cover;
-           
-            filter: none;
-            border:  2px solid #ff0000;
-            clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
+            /* ✅ Logo brightness increased */
+            filter: grayscale(0.6) contrast(1.2) brightness(1.8);
+            border: 2px solid #ff0000;
+            clip-path:  polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
             position: relative;
             z-index: 5;
         }
         
         h1 {
             font-size: clamp(24px, 6vw, 42px);
-            letter-spacing:  clamp(8px, 3vw, 18px);
+            letter-spacing: clamp(8px, 3vw, 18px);
             font-weight: 400;
             text-transform: uppercase;
             color: #ff0000;
@@ -112,7 +112,7 @@
                 2px 2px 0 #000,
                 0 0 20px rgba(255, 0, 0, 0.8),
                 0 0 40px rgba(255, 0, 0, 0.4);
-            margin: 20px 0 10px;
+            margin:  20px 0 10px;
             position: relative;
             display: inline-block;
         }
@@ -122,19 +122,19 @@
             content: '▰';
             position: absolute;
             color: #ff0000;
-            font-size:  0.4em;
+            font-size: 0.4em;
             animation: blink 1.5s infinite;
         }
         
         h1::before { left: -30px; }
-        h1::after { right: -30px; }
+        h1:: after { right: -30px; }
         
         @keyframes blink {
             0%, 49%, 100% { opacity: 1; }
             50%, 99% { opacity: 0; }
         }
         
-        .status {
+        . status {
             font-size: clamp(8px, 2vw, 11px);
             color: #666;
             letter-spacing: 3px;
@@ -146,7 +146,7 @@
             box-shadow: inset 0 0 10px rgba(255,0,0,0.1);
         }
         
-        .status::before {
+        .status:: before {
             content: '⚠ ';
             color: #ff0000;
             animation: blink 2s infinite;
@@ -180,7 +180,7 @@
             box-shadow: 0 0 0 1px #0a0a0a;
         }
         
-        .card::before {
+        .card:: before {
             content: '';
             position: absolute;
             inset: -1px;
@@ -199,7 +199,7 @@
         }
         
         .card:hover::before {
-            opacity:  0.3;
+            opacity: 0.3;
         }
         
         /* Video Box */
@@ -207,7 +207,7 @@
             position: relative;
             aspect-ratio: 16/9;
             background: #000;
-            overflow:  hidden;
+            overflow: hidden;
             border-bottom: 1px solid #0a0a0a;
         }
         
@@ -219,9 +219,9 @@
             color: #ff0000;
             font-size:  11px;
             letter-spacing: 4px;
-            z-index:  10;
+            z-index: 10;
             text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-            animation: pulse-loading 1. 5s infinite;
+            animation: pulse-loading 1.5s infinite;
         }
         
         @keyframes pulse-loading {
@@ -240,13 +240,13 @@
         }
         
         .card:hover video {
-            filter: blur(0) brightness(1) contrast(1) grayscale(0);
+            filter:  blur(0) brightness(1) contrast(1) grayscale(0);
         }
         
         /* Info Bar - Sharp */
         .info {
             padding: 12px 15px;
-            font-size:  10px;
+            font-size: 10px;
             color: #444;
             background: #000;
             border-top: 1px solid #ff0000;
@@ -269,13 +269,13 @@
         .info::after {
             content: '◼';
             color: #ff0000;
-            font-size:  6px;
+            font-size: 6px;
             animation: blink 3s infinite;
         }
         
-        .error-msg {
+        . error-msg {
             color: #ff0000;
-            font-size: 11px;
+            font-size:  11px;
             text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
             letter-spacing: 3px;
         }
@@ -293,11 +293,11 @@
         
         ::-webkit-scrollbar-thumb {
             background: #ff0000;
-            border: 2px solid #000;
+            border:  2px solid #000;
         }
         
         ::-webkit-scrollbar-thumb:hover {
-            background:  #cc0000;
+            background: #cc0000;
         }
         
         /* Mobile adjustments */
@@ -305,8 +305,7 @@
             h1 { letter-spacing: 8px; }
             .logo-wrap { width: 80px; height: 80px; }
             .status { font-size: 8px; padding: 5px 15px; }
-            /* ✅ Mobile pe lighter blur for better performance */
-            video { filter:  blur(15px) brightness(0.3) contrast(1.2) grayscale(0.5); }
+            video { filter: blur(15px) brightness(0.3) contrast(1.2) grayscale(0.5); }
         }
         
         /* Disable text selection */
@@ -342,19 +341,22 @@
 
     <header>
         <div class="logo-wrap">
-            <img src="logo.jpg" class="logo-img" alt="[REDACTED]">
+            <img src="logo.jpg" class="logo-img" alt="[REDACTED]" onerror="this.style.display='none'">
         </div>
-        <div class="status">ᴛʜɪꜱ ᴡᴇʙꜱɪᴛᴇ ɪꜱ ᴏɴ ᴛᴇꜱᴛɪɴɢ | 0.6% ᴄᴏᴍᴘʟᴇᴛᴇ: </div>
+        <h1>CLASSIFIED ARCHIVE</h1>
+        <div class="status">AUTHORIZED ACCESS ONLY • CLEARANCE LEVEL: RESTRICTED</div>
     </header>
 
     <div class="gallery" id="manualGallery"></div>
 
     <script>
         const container = document.getElementById('manualGallery');
-        const folder = "White-Kyle/";
+        
+        // ✅ FIX 1: Automatic path detection (works on GitHub Pages & localhost)
+        const folder = "./White-Kyle/";  // Relative path with ./
         const totalVideos = 84;
         
-        // ✅ Detect mobile device
+        // ✅ FIX 2: Detect mobile
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
         // Generate video gallery
@@ -362,10 +364,10 @@
             const card = document.createElement('div');
             card.className = 'card';
             
+            // ✅ FIX 3: Proper path construction
             const videoPath = `${folder}${i}.mp4`;
             const paddedNum = String(i).padStart(3, '0');
             
-            // ✅ Mobile optimization:  preload="none" instead of "metadata"
             const preloadType = isMobile ? 'none' : 'metadata';
             
             card.innerHTML = `
@@ -383,21 +385,26 @@
                     </video>
                 </div>
                 <div class="info">
-                    <span>FILE_${paddedNum}.MP4</span>
+                    <span>FILE_${paddedNum}. MP4</span>
                 </div>
             `;
             container.appendChild(card);
         }
         
-        // Error handler
+        // ✅ FIX 4: Better error handling with path display
         function handleVideoError(video) {
             const loadingDiv = video.previousElementSibling;
+            const videoSrc = video.querySelector('source').src;
+            
             if (loadingDiv) {
-                loadingDiv.innerHTML = '<span class="error-msg">⚠ ACCESS DENIED</span>';
+                loadingDiv.innerHTML = '<span class="error-msg">⚠ FILE NOT FOUND</span>';
             }
+            
+            // Console me path dikhao for debugging
+            console.error('Video load failed:', videoSrc);
         }
         
-        // ✅ Mobile video lag fix:  Load videos on scroll (lazy loading)
+        // ✅ FIX 5: Mobile lazy loading
         if (isMobile) {
             const observerOptions = {
                 root: null,
@@ -417,16 +424,17 @@
                 });
             }, observerOptions);
             
-            // Observe all videos
-            document. querySelectorAll('video').forEach(video => {
-                videoObserver.observe(video);
-            });
+            setTimeout(() => {
+                document.querySelectorAll('video').forEach(video => {
+                    videoObserver.observe(video);
+                });
+            }, 100);
         }
         
         // Security measures
         document.addEventListener('contextmenu', e => e.preventDefault());
         document.addEventListener('keydown', e => {
-            if (e. key === 'F12' || (e.ctrlKey && e. shiftKey && e.key === 'I')) {
+            if (e.key === 'F12' || (e.ctrlKey && e. shiftKey && e.key === 'I')) {
                 e.preventDefault();
             }
         });
