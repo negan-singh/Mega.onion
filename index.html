@@ -44,44 +44,44 @@
         body::after {
             content: '';
             position: fixed;
-            top:  0; left: 0; right: 0; bottom: 0;
+            top:   0; left: 0; right: 0; bottom: 0;
             background: radial-gradient(ellipse at center, transparent 30%, #000 100%);
-            pointer-events:  none;
-            z-index:  9998;
+            pointer-events:   none;
+            z-index:   9998;
         }
         
         /* Header - Centered */
         header {
-            padding: 30px 20px;
+            padding: 25px 20px;
             border-bottom: 2px solid #1a0000;
             margin-bottom: 40px;
-            text-align: center;
+            text-align:  center;
             background: linear-gradient(180deg, #0a0000 0%, #000 100%);
             box-shadow: 0 2px 0 #ff0000, 0 4px 20px rgba(255,0,0,0.2);
         }
         
-        . logo-wrap {
+        .logo-wrap {
             position: relative;
-            width: 100px;
-            height: 100px;
-            margin: 0 auto 20px;
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 15px;
             display: inline-block;
         }
         
         .logo-wrap::before,
         .logo-wrap::after {
-            content:  '';
+            content: '';
             position: absolute;
-            border:  1px solid #ff0000;
+            border:   1px solid #ff0000;
         }
         
         .logo-wrap::before {
-            inset: -8px;
+            inset: -6px;
             animation: rotate 10s linear infinite;
         }
         
-        .logo-wrap:: after {
-            inset: -12px;
+        .logo-wrap::after {
+            inset: -10px;
             animation: rotate 15s linear infinite reverse;
         }
         
@@ -90,21 +90,20 @@
             to { transform: rotate(360deg); }
         }
         
-        . logo-img {
-            width:  100%;
+        .logo-img {
+            width:   100%;
             height: 100%;
-            object-fit:  cover;
-            /* ✅ Logo brightness increased */
+            object-fit:   cover;
             filter: grayscale(0.6) contrast(1.2) brightness(1.8);
-            border: 2px solid #ff0000;
-            clip-path:  polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
+            border:  2px solid #ff0000;
+            clip-path:   polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
             position: relative;
             z-index: 5;
         }
         
         h1 {
-            font-size: clamp(24px, 6vw, 42px);
-            letter-spacing: clamp(8px, 3vw, 18px);
+            font-size: clamp(22px, 5vw, 38px);
+            letter-spacing: clamp(6px, 3vw, 16px);
             font-weight: 400;
             text-transform: uppercase;
             color: #ff0000;
@@ -112,7 +111,7 @@
                 2px 2px 0 #000,
                 0 0 20px rgba(255, 0, 0, 0.8),
                 0 0 40px rgba(255, 0, 0, 0.4);
-            margin:  20px 0 10px;
+            margin:   15px 0 10px;
             position: relative;
             display: inline-block;
         }
@@ -126,27 +125,27 @@
             animation: blink 1.5s infinite;
         }
         
-        h1::before { left: -30px; }
-        h1:: after { right: -30px; }
+        h1::before { left: -25px; }
+        h1::after { right: -25px; }
         
         @keyframes blink {
             0%, 49%, 100% { opacity: 1; }
             50%, 99% { opacity: 0; }
         }
         
-        . status {
-            font-size: clamp(8px, 2vw, 11px);
+        .status {
+            font-size: clamp(7px, 2vw, 10px);
             color: #666;
-            letter-spacing: 3px;
-            margin-top: 15px;
-            border:  1px solid #1a0000;
+            letter-spacing: 2px;
+            margin-top:  12px;
+            border:   1px solid #1a0000;
             display: inline-block;
-            padding: 6px 20px;
+            padding:  5px 15px;
             background: #050505;
             box-shadow: inset 0 0 10px rgba(255,0,0,0.1);
         }
         
-        .status:: before {
+        .status::before {
             content: '⚠ ';
             color: #ff0000;
             animation: blink 2s infinite;
@@ -164,23 +163,27 @@
         
         @media (max-width: 768px) {
             .gallery {
-                grid-template-columns:  1fr;
+                grid-template-columns:   1fr;
                 gap: 25px;
                 padding: 15px;
+            }
+            .logo-wrap { 
+                width: 60px; 
+                height: 60px; 
             }
         }
         
         /* Card - Sharp edges, no border-radius */
         .card {
             background: #000;
-            border:  1px solid #1a0000;
+            border:   1px solid #1a0000;
             overflow: hidden;
             transition: all 0.3s ease;
             position: relative;
             box-shadow: 0 0 0 1px #0a0a0a;
         }
         
-        .card:: before {
+        .card::before {
             content: '';
             position: absolute;
             inset: -1px;
@@ -217,11 +220,11 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: #ff0000;
-            font-size:  11px;
-            letter-spacing: 4px;
+            font-size:   11px;
+            letter-spacing:  4px;
             z-index: 10;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-            animation: pulse-loading 1.5s infinite;
+            text-shadow:  0 0 10px rgba(255, 0, 0, 0.8);
+            animation: pulse-loading 1. 5s infinite;
         }
         
         @keyframes pulse-loading {
@@ -240,7 +243,7 @@
         }
         
         .card:hover video {
-            filter:  blur(0) brightness(1) contrast(1) grayscale(0);
+            filter:   blur(0) brightness(1) contrast(1) grayscale(0);
         }
         
         /* Info Bar - Sharp */
@@ -273,16 +276,16 @@
             animation: blink 3s infinite;
         }
         
-        . error-msg {
+        .error-msg {
             color: #ff0000;
-            font-size:  11px;
+            font-size:   11px;
             text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
             letter-spacing: 3px;
         }
         
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 10px;
+            width:  10px;
             height: 10px;
         }
         
@@ -293,7 +296,7 @@
         
         ::-webkit-scrollbar-thumb {
             background: #ff0000;
-            border:  2px solid #000;
+            border:   2px solid #000;
         }
         
         ::-webkit-scrollbar-thumb:hover {
@@ -302,9 +305,8 @@
         
         /* Mobile adjustments */
         @media (max-width: 768px) {
-            h1 { letter-spacing: 8px; }
-            .logo-wrap { width: 80px; height: 80px; }
-            .status { font-size: 8px; padding: 5px 15px; }
+            h1 { letter-spacing: 6px; }
+            .status { font-size: 7px; padding: 4px 12px; }
             video { filter: blur(15px) brightness(0.3) contrast(1.2) grayscale(0.5); }
         }
         
@@ -321,18 +323,18 @@
             content: '◢';
             position: absolute;
             color: #ff0000;
-            font-size: 20px;
+            font-size: 18px;
             opacity: 0.3;
         }
         
         header::before {
-            top:  10px;
+            top:   10px;
             left: 10px;
         }
         
         header::after {
-            top: 10px;
-            right: 10px;
+            top:  10px;
+            right:  10px;
             transform: scaleX(-1);
         }
     </style>
@@ -352,11 +354,18 @@
     <script>
         const container = document.getElementById('manualGallery');
         
-        // ✅ FIX 1: Automatic path detection (works on GitHub Pages & localhost)
-        const folder = "./White-Kyle/";  // Relative path with ./
-        const totalVideos = 84;
+        // ✅ SOLUTION: Use GitHub Pages relative path
+        // Yeh automatically detect karega correct path
+        const repoName = "On-Testing. Onion";  // Your repo name from URL
+        const branch = "main";  // Your branch (usually 'main' or 'master')
         
-        // ✅ FIX 2: Detect mobile
+        // Construct base path
+        const isGitHubPages = window. location.hostname. includes('github.io');
+        const folder = isGitHubPages 
+            ? `/${repoName}/White-Kyle/`  // GitHub Pages path
+            : './White-Kyle/';             // Local path
+        
+        const totalVideos = 84;
         const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
         
         // Generate video gallery
@@ -364,7 +373,6 @@
             const card = document.createElement('div');
             card.className = 'card';
             
-            // ✅ FIX 3: Proper path construction
             const videoPath = `${folder}${i}.mp4`;
             const paddedNum = String(i).padStart(3, '0');
             
@@ -378,6 +386,7 @@
                         preload="${preloadType}"
                         playsinline
                         onloadedmetadata="this.previousElementSibling.style.display='none'"
+                        onloadeddata="videoLoaded(this)"
                         onerror="handleVideoError(this)"
                         controlsList="nodownload"
                     >
@@ -391,7 +400,16 @@
             container.appendChild(card);
         }
         
-        // ✅ FIX 4: Better error handling with path display
+        // Video loaded successfully
+        function videoLoaded(video) {
+            const loadingDiv = video.parentElement. querySelector('.loading');
+            if (loadingDiv) {
+                loadingDiv.style.display = 'none';
+            }
+            console.log('✅ Video loaded:', video.querySelector('source').src);
+        }
+        
+        // Error handler
         function handleVideoError(video) {
             const loadingDiv = video.previousElementSibling;
             const videoSrc = video.querySelector('source').src;
@@ -400,11 +418,20 @@
                 loadingDiv.innerHTML = '<span class="error-msg">⚠ FILE NOT FOUND</span>';
             }
             
-            // Console me path dikhao for debugging
-            console.error('Video load failed:', videoSrc);
+            console.error('❌ Video failed:', videoSrc);
+            
+            // Try fallback path
+            const source = video.querySelector('source');
+            if (! source. dataset.retried) {
+                source.dataset. retried = 'true';
+                const altPath = videoSrc.replace('/White-Kyle/', '/white-kyle/'); // Try lowercase
+                source.src = altPath;
+                video.load();
+                console.log('🔄 Retrying with:', altPath);
+            }
         }
         
-        // ✅ FIX 5: Mobile lazy loading
+        // Mobile lazy loading
         if (isMobile) {
             const observerOptions = {
                 root: null,
@@ -413,7 +440,7 @@
             };
             
             const videoObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
+                entries. forEach(entry => {
                     if (entry.isIntersecting) {
                         const video = entry.target;
                         if (video.tagName === 'VIDEO' && ! video.dataset.loaded) {
@@ -438,6 +465,11 @@
                 e.preventDefault();
             }
         });
+        
+        // Debug: Log paths
+        console.log('🔍 Base folder:', folder);
+        console.log('🌐 Is GitHub Pages:', isGitHubPages);
+        console.log('📱 Is Mobile:', isMobile);
     </script>
 </body>
 </html>
