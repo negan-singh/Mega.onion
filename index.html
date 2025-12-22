@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>White-Kyle | Final Archive</title>
+    <style>
+        body { background: #020202; color: white; font-family: sans-serif; margin: 0; padding: 20px; text-align: center; }
+        header { padding: 40px; border-bottom: 1px solid #1a1a1a; margin-bottom: 30px; }
+        .logo-wrap { position: relative; width: 110px; height: 110px; margin: 0 auto 20px; }
+        .logo-wrap::before { content: ''; position: absolute; inset: -8px; border: 2px solid #ff3e3e; border-radius: 50%; animation: wave 2.5s linear infinite; }
+        @keyframes wave { 0% { transform: scale(1); opacity: 0.6; } 100% { transform: scale(1.6); opacity: 0; } }
+        .logo-img { width: 100%; height: 100%; border-radius: 50%; border: 3px solid #ff3e3e; object-fit: cover; position: relative; z-index: 5; }
+        
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; max-width: 1600px; margin: 0 auto; }
+        .card { background: #0a0a0a; border: 1px solid #222; border-radius: 20px; overflow: hidden; transition: 0.4s; }
+        .card:hover { border-color: #ff3e3e; transform: translateY(-8px); }
+        .vid-box { position: relative; aspect-ratio: 16/9; background: #000; overflow: hidden; }
+        video { width: 100%; height: 100%; object-fit: cover; filter: blur(20px) brightness(0.3); transition: 0.7s; }
+        .card:hover video { filter: blur(0) brightness(1); }
+        .info { padding: 15px; font-size: 11px; color: #444; background: #000; text-align: left; font-family: monospace; }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <header>
+        <div class="logo-wrap"><img src="logo.jpg" class="logo-img"></div>
+        <h1 style="letter-spacing: 12px; font-weight: 200;">THE ARCHIVE</h1>
+        <div style="font-size: 10px; color: #555;">UNDER DEVELOPMENT: COMPLETE 0.2%</div>
+    </header>
+
+    <div class="gallery" id="manualGallery">
+        </div>
+
+    <script>
+        const container = document.getElementById('manualGallery');
+        const folder = "White-Kyle/";
+        
+        // Loop for generating 84 manual blocks
+        for (let i = 1; i <= 84; i++) {
+            const card = document.createElement('div');
+            card.className = 'card';
+            card.innerHTML = `
+                <div class="vid-box">
+                    <video controls preload="metadata">
+                        <source src="${folder}${i}.mp4" type="video/mp4">
+                    </video>
+                </div>
+                <div class="info">DATA_STREAM_${i}.mp4</div>
+            `;
+            container.appendChild(card);
+        }
+    </script>
+</body>
+</html>
