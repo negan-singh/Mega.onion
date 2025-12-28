@@ -5,15 +5,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title></title>
 
-<!-- Tailwind -->
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- Icons -->
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
 :root{
   --red:#df2531;
-  --black:#000000;
+  --black:#000;
 }
 
 /* Base */
@@ -21,9 +19,10 @@ body{
   margin:0;
   background:radial-gradient(circle at center,#1a0505 0%,#000 70%);
   overflow-x:hidden;
+  touch-action:manipulation;
 }
 
-/* Scanlines (tension) */
+/* Scanlines */
 .scanlines{
   position:fixed;
   inset:0;
@@ -35,57 +34,34 @@ body{
   z-index:999;
 }
 
-/* Scroll glow (engagement) */
-.scroll-glow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  background:radial-gradient(circle at center,rgba(223,37,49,.14),transparent 70%);
-  opacity:0;
-  transition:.15s;
-  z-index:10;
-}
-
-/* Cards */
+/* Gallery cards */
 .card{
   background:#000;
   border:1px solid #111;
   overflow:hidden;
-  transition:.25s ease;
-  will-change:transform, box-shadow;
+  transition:transform .2s ease, box-shadow .2s ease;
+  will-change:transform;
 }
 .card:hover{
   border-color:var(--red);
-  box-shadow:0 0 18px rgba(223,37,49,.45);
+  box-shadow:0 0 20px rgba(223,37,49,.45);
 }
 .card:active{
-  transform:scale(.95);
-  box-shadow:0 0 35px rgba(223,37,49,.7);
+  transform:scale(.94);
 }
 
-/* Images */
 .card img{
   width:100%;
   height:100%;
   object-fit:cover;
-  opacity:.85;
-  transition:.6s ease;
-  filter:contrast(1) saturate(1);
+  opacity:.9;
+  transition:transform .4s ease, opacity .3s ease;
+  will-change:transform;
 }
-.card:hover img,
-.card:active img{
+.card:hover img{
+  transform:scale(1.1);
   opacity:1;
-  transform:scale(1.12);
-  filter:contrast(1.15) saturate(1.2);
 }
-
-/* Pulse on hover (heartbeat mimic) */
-@keyframes pulseRed{
-  0%{ box-shadow:0 0 10px rgba(223,37,49,.3); }
-  50%{ box-shadow:0 0 30px rgba(223,37,49,.6); }
-  100%{ box-shadow:0 0 10px rgba(223,37,49,.3); }
-}
-.card:hover{ animation:pulseRed 1.6s infinite; }
 
 /* Modal */
 #modal{
@@ -101,7 +77,48 @@ body{
   max-width:100%;
   max-height:100%;
   border:1px solid rgba(223,37,49,.4);
-  box-shadow:0 0 40px rgba(223,37,49,.45);
+  box-shadow:0 0 40px rgba(223,37,49,.5);
+}
+
+/* CURSOR SYSTEM */
+.cursor-core{
+  position:fixed;
+  width:8px;
+  height:8px;
+  background:var(--red);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:2000;
+  transform:translate(-50%,-50%);
+}
+.cursor-ring{
+  position:fixed;
+  width:36px;
+  height:36px;
+  border:1px solid rgba(223,37,49,.5);
+  border-radius:50%;
+  pointer-events:none;
+  z-index:1999;
+  transform:translate(-50%,-50%);
+  box-shadow:0 0 30px rgba(223,37,49,.4);
+}
+
+/* Click ripple */
+.ripple{
+  position:fixed;
+  width:10px;
+  height:10px;
+  border:2px solid rgba(223,37,49,.7);
+  border-radius:50%;
+  pointer-events:none;
+  animation:ripple .5s ease-out forwards;
+  z-index:1998;
+}
+@keyframes ripple{
+  to{
+    transform:scale(6);
+    opacity:0;
+  }
 }
 </style>
 </head>
@@ -109,86 +126,103 @@ body{
 <body>
 
 <div class="scanlines"></div>
-<div class="scroll-glow" id="scrollGlow"></div>
+
+<!-- CURSOR -->
+<div class="cursor-ring" id="ring"></div>
+<div class="cursor-core" id="core"></div>
 
 <!-- TOP LOGO -->
 <header class="flex justify-center py-4">
   <img src="logo.png" class="h-10" alt="">
 </header>
 
-<!-- CENTER ICON (fixation point) -->
+<!-- CENTER ICON -->
 <div class="flex justify-center mb-3">
   <i data-lucide="aperture" class="w-9 h-9 text-[#df2531]"></i>
 </div>
 
-<!-- GALLERY (MOBILE: 4 COLUMNS FORCED) -->
+<!-- GALLERY -->
 <main class="max-w-7xl mx-auto px-1 pb-20">
-  <div id="gallery" class="grid grid-cols-4 gap-[2px] md:grid-cols-4 md:gap-3"></div>
+  <div id="gallery" class="grid grid-cols-4 gap-[2px]"></div>
 </main>
 
 <!-- MODAL -->
 <div id="modal">
-  <img id="modalImg" alt="">
+  <img id="modalImg">
 </div>
 
 <script>
 lucide.createIcons();
 
-/* Images */
-const images=[
-  'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
-  'https://images.unsplash.com/photo-1550751827-4bd374c3f58b',
-  'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2',
-  'https://images.unsplash.com/photo-1515630278258-407f66498911',
-  'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0',
-  'https://images.unsplash.com/photo-1558494949-efc5e60dc549',
-  'https://images.unsplash.com/photo-1563206767-5b1d97289374',
-  'https://images.unsplash.com/photo-1451187580459-43490279c0fa'
-];
+/* Local images */
+const images = Array.from({length:10},(_,i)=>`images/${i+1}.png`);
 
-const gallery=document.getElementById('gallery');
-const modal=document.getElementById('modal');
-const modalImg=document.getElementById('modalImg');
-const glow=document.getElementById('scrollGlow');
+const gallery = document.getElementById('gallery');
+const modal = document.getElementById('modal');
+const modalImg = document.getElementById('modalImg');
 
-/* Render fast */
+/* Render instantly */
 images.forEach(src=>{
   const d=document.createElement('div');
   d.className='card';
-  d.innerHTML=`<img src="${src}" loading="lazy" decoding="async">`;
-  d.onclick=()=>{
-    // anticipation delay (dopamine)
-    d.style.transform='scale(.96)';
-    setTimeout(()=>{
-      openModal(src);
-      d.style.transform='';
-    },140);
-  };
+  d.innerHTML=`<img src="${src}" loading="eager">`;
+  d.onclick=()=>openModal(src);
   gallery.appendChild(d);
 });
 
-/* Modal + Back button */
+/* Modal */
 function openModal(src){
   modalImg.src=src;
   modal.style.display='flex';
-  history.pushState({modal:true},'');
+  history.pushState({m:1},'');
 }
+modal.onclick=()=>closeModal();
 function closeModal(){
   modal.style.display='none';
   modalImg.src='';
 }
-modal.onclick=closeModal;
+window.onpopstate=()=>{ if(modal.style.display==='flex') closeModal(); };
 
-/* Back button closes modal */
-window.onpopstate=()=>{
-  if(modal.style.display==='flex') closeModal();
-};
+/* CURSOR LOGIC */
+const core=document.getElementById('core');
+const ring=document.getElementById('ring');
+let x=0,y=0,tx=0,ty=0;
 
-/* Scroll engagement glow */
-window.addEventListener('scroll',()=>{
-  glow.style.opacity='1';
-  clearTimeout(window._sg);
-  window._sg=setTimeout(()=>glow.style.opacity='0',120);
+function animate(){
+  x+=(tx-x)*0.2;
+  y+=(ty-y)*0.2;
+  core.style.left=x+'px';
+  core.style.top=y+'px';
+  ring.style.left=x+'px';
+  ring.style.top=y+'px';
+  requestAnimationFrame(animate);
+}
+animate();
+
+/* Mouse */
+document.addEventListener('mousemove',e=>{
+  tx=e.clientX;
+  ty=e.clientY;
+});
+
+/* Touch */
+document.addEventListener('touchstart',e=>{
+  tx=e.touches[0].clientX;
+  ty=e.touches[0].clientY;
+});
+document.addEventListener('touchmove',e=>{
+  tx=e.touches[0].clientX;
+  ty=e.touches[0].clientY;
+});
+
+/* Click ripple */
+document.addEventListener('click',e=>{
+  const r=document.createElement('div');
+  r.className='ripple';
+  r.style.left=e.clientX+'px';
+  r.style.top=e.clientY+'px';
+  document.body.appendChild(r);
+  setTimeout(()=>r.remove(),500);
 });
 </script>
 
