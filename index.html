@@ -118,7 +118,7 @@ body{
   transform: scale(1);
 }
 
-/* Modal Controls - Simplified (Only Close) */
+/* Modal Controls */
 .modal-controls {
   position: absolute;
   top: 0;
@@ -126,7 +126,7 @@ body{
   width: 100%;
   padding: 20px;
   display: flex;
-  justify-content: flex-end; /* Aligned to right since only one button */
+  justify-content: flex-end; 
   align-items: center;
   z-index: 3001;
   background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
@@ -162,6 +162,56 @@ body{
   pointer-events: none;
 }
 
+/* --- LOGIN SCREEN STYLES --- */
+#login-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #000;
+  transition: opacity 0.8s ease-in-out, visibility 0.8s;
+  will-change: opacity;
+}
+
+/* UPDATED: Video Background Styling */
+.login-bg {
+  position: absolute;
+  inset: -50px; /* Slight overflow to hide blur edges */
+  width: calc(100% + 100px); /* Ensure coverage */
+  height: calc(100% + 100px);
+  object-fit: cover; /* Maintain video aspect ratio while filling */
+  
+  /* Increased Blur to 80px (~80% feel) */
+  filter: blur(8px) brightness(0.6); 
+  z-index: 0;
+  transform: scale(1.1);
+  will-change: transform;
+}
+
+.login-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-direction: column; 
+  align-items: center;
+  gap: 1.5rem;
+  width: 100%;
+  max-width: 320px;
+  padding: 20px;
+}
+
+/* Shake Animation for Wrong Password */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+.shake {
+  animation: shake 0.4s ease-in-out;
+}
+
 /* --- SNAKE CURSOR STYLES --- */
 .snake-head {
     width: 12px;
@@ -171,7 +221,7 @@ body{
     position: fixed;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 4001;
+    z-index: 10001; /* Highest z-index */
     box-shadow: 0 0 15px var(--red);
 }
 
@@ -183,7 +233,7 @@ body{
     position: fixed;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 4000;
+    z-index: 10000;
     opacity: 0.6;
     transition: opacity 0.2s;
 }
@@ -212,40 +262,111 @@ body{
 
 <div class="scanlines"></div>
 
-<header class="flex flex-col items-center justify-center py-8">
-    <!-- LOGO ADDED HERE -->
-    <img src="logo.png" alt="Gallery Logo" class="max-w-[200px] md:max-w-[300px] h-auto object-contain drop-shadow-[0_0_15px_rgba(223,37,49,0.5)] transition-all hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/300x100/000/df2531?text=LOGO'">
-</header>
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <!-- UPDATED: Video Background with Fallback -->
+  <!-- 'poster' attribute shows image while video loads or if it fails -->
+  <video class="login-bg" autoplay muted loop playsinline poster="logo.png">
+    <source src="White-Kyle/27.mp4" type="video/mp4">
+    <!-- Fallback image logic is handled by CSS background if video tag fails entirely, 
+         but 'poster' is the standard way -->
+  </video>
+  
+  <!-- Content - Wrapped in Form for Mobile Enter Key Support -->
+  <form class="login-content" id="loginForm" onsubmit="event.preventDefault(); attemptLogin();">
+    <div class="text-[#df2531] text-lg font-bold tracking-[0.3em] mb-2 drop-shadow-[0_0_10px_rgba(223,37,49,0.8)]">∀ƆƆƎSS-⋊ǝʎ</div>
+    
+    <input type="password" id="passwordInput" placeholder="ENTER PASSWORD" autocomplete="off"
+           class="w-full bg-black/40 border border-[#df2531]/40 text-white px-6 py-4 rounded-full outline-none focus:border-[#df2531] focus:shadow-[0_0_25px_rgba(223,37,49,0.3)] focus:bg-black/60 transition-all text-center tracking-widest placeholder:text-gray-500 font-mono text-xl backdrop-blur-sm">
+           
+    <!-- Visible Button for Touch Devices -->
+    <button type="submit" id="loginBtn" class="mt-4 px-8 py-3 border border-[#df2531]/30 text-[#df2531] hover:bg-[#df2531] hover:text-white transition-all duration-300 rounded uppercase tracking-wider text-sm font-bold cursor-pointer">
+      Unlock
+    </button>
+    
+    <div id="loginError" class="text-red-500 text-sm tracking-widest opacity-0 transition-opacity font-bold">ACCESS DENIED</div>
+  </form>
+</div>
 
-<main class="max-w-7xl mx-auto px-4 pb-20">
-  <!-- Updated Grid: Always 4 columns as requested -->
-  <div id="gallery" class="grid grid-cols-4 gap-2 md:gap-6"></div>
-</main>
+<!-- MAIN APP (Hidden initially) -->
+<div id="main-app" class="opacity-0 transition-opacity duration-1000">
+
+    <header class="flex flex-col items-center justify-center py-8">
+        <img src="logo.png" alt="Gallery Logo" class="max-w-[120px] md:max-w-[200px] h-auto object-contain drop-shadow-[0_0_15px_rgba(223,37,49,0.5)] transition-all hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/300x100/000/df2531?text=LOGO'">
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pb-20">
+      <div id="gallery" class="grid grid-cols-4 gap-2 md:gap-6"></div>
+    </main>
+
+</div>
 
 <!-- Improved Modal Structure -->
 <div id="modal">
-  <!-- Top Bar Controls -->
   <div class="modal-controls">
-    <!-- Removed Download Button -->
     <button class="modal-btn" id="closeBtn" title="Close">
       <i data-lucide="x" width="24" height="24"></i>
     </button>
   </div>
-
   <img id="modalImg" src="" alt="Full View">
-  
   <div class="modal-hint">Tap outside to close</div>
 </div>
 
 <script>
 /* -----------------------------------------------------
-   SETTINGS: Yahan update karein
+   LOGIN LOGIC
+----------------------------------------------------- */
+const loginScreen = document.getElementById('login-screen');
+const passInput = document.getElementById('passwordInput');
+const loginError = document.getElementById('loginError');
+const mainApp = document.getElementById('main-app');
+const correctPass = "Negan";
+
+// Focus input immediately on load
+window.onload = () => {
+    // Attempt focus, might be blocked on mobile until tap, but safe to try
+    setTimeout(() => passInput.focus(), 100);
+    // Preload gallery assets smoothly
+    initGallery();
+};
+
+function attemptLogin() {
+    const val = passInput.value;
+    
+    if (val === correctPass) {
+        // Success
+        passInput.blur();
+        loginScreen.style.opacity = '0';
+        loginScreen.style.visibility = 'hidden';
+        
+        // Reveal App
+        mainApp.style.opacity = '1';
+        
+        // Ensure scroll is unlocked
+        document.body.style.overflow = '';
+    } else {
+        // Fail
+        passInput.value = '';
+        loginError.style.opacity = '1';
+        passInput.parentElement.classList.add('shake');
+        passInput.classList.add('border-red-600');
+        
+        setTimeout(() => {
+            passInput.parentElement.classList.remove('shake');
+            passInput.classList.remove('border-red-600');
+            loginError.style.opacity = '0';
+            passInput.focus();
+        }, 1500);
+    }
+}
+
+
+/* -----------------------------------------------------
+   GALLERY SETTINGS
 ----------------------------------------------------- */
 const totalFiles = 50;       
 const fileExtension = '.jpg'; 
 const folderPath = 'images/'; 
-
-/* Generate Array Automatically */
 const images = Array.from({length: totalFiles}, (_, i) => `${folderPath}${i + 1}${fileExtension}`);
 
 const gallery = document.getElementById('gallery');
@@ -253,22 +374,27 @@ const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modalImg');
 const closeBtn = document.getElementById('closeBtn');
 
-/* Render Loop */
-images.forEach((src, index) => {
-  const d = document.createElement('div');
-  d.className = 'card group'; 
-  
-  // Stagger animation for entry
-  d.style.animation = `fadeIn 0.5s ease forwards ${index * 0.05}s`;
-  d.style.opacity = '0';
+function initGallery() {
+    /* Render Loop - Efficiently */
+    const fragment = document.createDocumentFragment();
+    
+    images.forEach((src, index) => {
+      const d = document.createElement('div');
+      d.className = 'card group'; 
+      
+      // Setup animation styles but pause them until login? 
+      // Actually CSS animations run, but opacity 0 on main-app hides them.
+      d.style.animation = `fadeIn 0.6s ease forwards ${index * 0.03}s`;
+      d.style.opacity = '0';
 
-  // Placeholder logic maintained
-  d.innerHTML = `<img src="${src}" loading="lazy" alt="Gallery Image ${index + 1}" onerror="this.onerror=null;this.src='https://placehold.co/600x800/111/df2531?text=IMG+${index + 1}'">`;
-  
-  // Interaction
-  d.onclick = () => openModal(d.querySelector('img').src);
-  gallery.appendChild(d);
-});
+      d.innerHTML = `<img src="${src}" loading="lazy" alt="Gallery Image ${index + 1}" onerror="this.onerror=null;this.src='https://placehold.co/600x800/111/df2531?text=IMG+${index + 1}'">`;
+      
+      d.onclick = () => openModal(d.querySelector('img').src);
+      fragment.appendChild(d);
+    });
+    
+    gallery.appendChild(fragment);
+}
 
 // Add keyframes for fade in
 const styleSheet = document.createElement("style");
@@ -281,29 +407,27 @@ styleSheet.innerText = `
 document.head.appendChild(styleSheet);
 
 
-/* --- IMPROVED MODAL LOGIC --- */
+/* --- MODAL LOGIC --- */
 function openModal(src){
   modalImg.src = src;
-  modal.classList.add('active'); // Use class for animation
-  document.body.style.overflow = 'hidden'; // Lock scroll
+  modal.classList.add('active'); 
+  document.body.style.overflow = 'hidden'; 
 }
 
 function closeModal(){
   modal.classList.remove('active');
   setTimeout(() => {
      if(!modal.classList.contains('active')) modalImg.src = ''; 
-  }, 300); // Clear src after fade out
+  }, 300); 
   document.body.style.overflow = '';
 }
 
-// Close events
 closeBtn.onclick = (e) => {
   e.stopPropagation();
   closeModal();
 };
 
 modal.onclick = (e) => {
-  // Close only if clicking the background (backdrop), not the image itself
   if(e.target === modal) {
     closeModal();
   }
@@ -344,7 +468,7 @@ function animate() {
     let prevY = mouseY;
 
     trail.forEach((t, index) => {
-        const speed = 0.35; 
+        const speed = 0.4; 
         t.x += (prevX - t.x) * speed;
         t.y += (prevY - t.y) * speed;
 
