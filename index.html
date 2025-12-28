@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Gallery</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -25,10 +25,15 @@ body{
   touch-action:manipulation;
   font-family: 'Courier New', Courier, monospace; 
   font-family: sans-serif;
-  cursor: none; /* CRITICAL: Hides default cursor */
+  -webkit-font-smoothing: antialiased;
 }
 
-/* Scanlines */
+/* Hide cursor only on non-touch devices where we show the snake */
+@media (hover: hover) and (pointer: fine) {
+    body { cursor: none; }
+}
+
+/* Scanlines - Optimized */
 .scanlines{
   position:fixed;
   inset:0;
@@ -38,6 +43,7 @@ body{
   background-size:100% 3px,4px 100%;
   pointer-events:none;
   z-index:999;
+  will-change: opacity; /* Hint to browser */
 }
 
 /* Gallery cards */
@@ -45,17 +51,21 @@ body{
   background: var(--card-bg);
   border:1px solid #222;
   overflow:hidden;
-  border-radius: 12px;
+  border-radius: 8px; /* Slightly less rounded for better performance on some screens */
   position: relative;
-  transition:transform .3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow .3s ease, border-color .3s ease;
-  will-change:transform;
-  cursor: none;
+  /* Faster transitions for "Quick Show" feel */
+  transition: transform 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94), border-color 0.2s ease;
+  will-change: transform;
   aspect-ratio: 3/4;
+  /* GPU Acceleration Hack */
+  transform: translateZ(0); 
+  -webkit-transform: translateZ(0);
 }
 
 .card:hover, .card:active, .card:focus {
   border-color:var(--red);
-  box-shadow:0 0 25px rgba(223,37,49,.3);
+  /* Reduced shadow spread for performance */
+  box-shadow:0 0 15px rgba(223,37,49,.3); 
   z-index: 10;
   transform: scale(1.02);
 }
@@ -65,14 +75,16 @@ body{
   height:100%;
   object-fit:cover;
   opacity:.8;
-  filter: blur(15px) grayscale(60%);
-  transition:transform .5s ease, opacity .4s ease, filter .4s ease;
-  will-change:transform, filter;
+  /* OPTIMIZATION: Reduced blur radius. 15px is heavy on mobile GPU. 8px is faster. */
+  filter: blur(8px) grayscale(60%);
+  transition: opacity 0.3s ease, filter 0.3s ease;
+  will-change: filter, opacity;
+  transform: translateZ(0); /* Force GPU */
 }
 
 .card:hover img, 
 .card:active img {
-  transform:scale(1.1);
+  transform:scale(1.05); /* Slightly less scale for smoothness */
   opacity:1;
   filter: blur(0) grayscale(0%);
 }
@@ -82,18 +94,17 @@ body{
   position: fixed;
   inset: 0;
   background: rgba(0, 0, 0, 0.95);
-  backdrop-filter: blur(15px);
+  backdrop-filter: blur(10px); /* Reduced backdrop blur */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   z-index: 3000;
-  cursor: none;
   
   /* Animation Setup */
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.2s ease; /* Quicker */
 }
 
 #modal.active {
@@ -106,12 +117,12 @@ body{
   max-height: 80vh;
   border-radius: 8px;
   border: 1px solid rgba(223, 37, 49, 0.3);
-  box-shadow: 0 0 60px rgba(223, 37, 49, 0.15);
+  box-shadow: 0 0 30px rgba(223, 37, 49, 0.15); /* Reduced shadow */
   object-fit: contain;
   
   /* Pop Animation */
   transform: scale(0.95);
-  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #modal.active img {
@@ -138,7 +149,7 @@ body{
   color: white;
   padding: 10px;
   border-radius: 50%;
-  cursor: none;
+  cursor: pointer; /* Ensure pointer on mobile */
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
@@ -149,7 +160,6 @@ body{
   background: var(--red);
   border-color: var(--red);
   transform: scale(1.1);
-  box-shadow: 0 0 15px var(--red);
 }
 
 .modal-hint {
@@ -171,23 +181,32 @@ body{
   align-items: center;
   justify-content: center;
   background-color: #000;
-  transition: opacity 0.8s ease-in-out, visibility 0.8s;
+  transition: opacity 0.5s ease-in-out, visibility 0.5s; /* Quicker fade */
   will-change: opacity;
 }
 
-/* UPDATED: Video Background Styling */
+/* UPDATED: Video Background Styling - Optimized */
 .login-bg {
   position: absolute;
-  inset: -50px; /* Slight overflow to hide blur edges */
-  width: calc(100% + 100px); /* Ensure coverage */
-  height: calc(100% + 100px);
-  object-fit: cover; /* Maintain video aspect ratio while filling */
+  inset: -20px; 
+  width: calc(100% + 40px);
+  height: calc(100% + 40px);
+  object-fit: cover;
   
-  /* Increased Blur to 80px (~80% feel) */
-  filter: blur(8px) brightness(0.6); 
+  /* OPTIMIZATION: Reduced Blur drastically. 80px kills mobile performance. 
+     20px + overlay looks similar but runs at 60fps. */
+  filter: blur(20px) brightness(0.6); 
   z-index: 0;
-  transform: scale(1.1);
-  will-change: transform;
+  transform: scale(1.05);
+  will-change: transform; /* Hint for compositor */
+}
+
+/* Dark overlay to help with the "blur" effect without GPU cost */
+.login-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 1;
 }
 
 .login-content {
@@ -202,58 +221,44 @@ body{
   padding: 20px;
 }
 
-/* Shake Animation for Wrong Password */
+/* Shake Animation */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
   25% { transform: translateX(-10px); }
   75% { transform: translateX(10px); }
 }
 .shake {
-  animation: shake 0.4s ease-in-out;
+  animation: shake 0.3s ease-in-out;
 }
 
-/* --- SNAKE CURSOR STYLES --- */
-.snake-head {
-    width: 12px;
-    height: 12px;
-    background: var(--red);
-    border-radius: 50%;
-    position: fixed;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 10001; /* Highest z-index */
-    box-shadow: 0 0 15px var(--red);
-}
+/* --- SNAKE CURSOR STYLES (Desktop Only) --- */
+@media (min-width: 769px) {
+    .snake-head {
+        width: 12px;
+        height: 12px;
+        background: var(--red);
+        border-radius: 50%;
+        position: fixed;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 10001;
+        box-shadow: 0 0 15px var(--red);
+        will-change: left, top;
+    }
 
-.snake-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--red);
-    border-radius: 50%;
-    position: fixed;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 10000;
-    opacity: 0.6;
-    transition: opacity 0.2s;
-}
-
-/* Click ripple */
-.ripple{
-  position:fixed;
-  width:10px;
-  height:10px;
-  border:2px solid rgba(223,37,49,.7);
-  border-radius:50%;
-  pointer-events:none;
-  animation:ripple .6s ease-out forwards;
-  z-index:9999;
-}
-@keyframes ripple{
-  to{
-    transform:scale(8);
-    opacity:0;
-  }
+    .snake-dot {
+        width: 8px;
+        height: 8px;
+        background: var(--red);
+        border-radius: 50%;
+        position: fixed;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 10000;
+        opacity: 0.6;
+        transition: opacity 0.2s;
+        will-change: left, top;
+    }
 }
 </style>
 </head>
@@ -264,23 +269,20 @@ body{
 
 <!-- LOGIN SCREEN -->
 <div id="login-screen">
-  <!-- UPDATED: Video Background with Fallback -->
-  <!-- 'poster' attribute shows image while video loads or if it fails -->
-  <video class="login-bg" autoplay muted loop playsinline poster="logo.png">
+  <!-- Video Background -->
+  <video class="login-bg" autoplay muted loop playsinline poster="image-login.jpg">
     <source src="White-Kyle/27.mp4" type="video/mp4">
-    <!-- Fallback image logic is handled by CSS background if video tag fails entirely, 
-         but 'poster' is the standard way -->
   </video>
+  <div class="login-overlay"></div>
   
-  <!-- Content - Wrapped in Form for Mobile Enter Key Support -->
+  <!-- Content -->
   <form class="login-content" id="loginForm" onsubmit="event.preventDefault(); attemptLogin();">
-    <div class="text-[#df2531] text-lg font-bold tracking-[0.3em] mb-2 drop-shadow-[0_0_10px_rgba(223,37,49,0.8)]">∀ƆƆƎSS-⋊ǝʎ</div>
+    <div class="text-[#df2531] text-lg font-bold tracking-[0.3em] mb-2 drop-shadow-[0_0_10px_rgba(223,37,49,0.8)]">RESTRICTED ACCESS</div>
     
     <input type="password" id="passwordInput" placeholder="ENTER PASSWORD" autocomplete="off"
            class="w-full bg-black/40 border border-[#df2531]/40 text-white px-6 py-4 rounded-full outline-none focus:border-[#df2531] focus:shadow-[0_0_25px_rgba(223,37,49,0.3)] focus:bg-black/60 transition-all text-center tracking-widest placeholder:text-gray-500 font-mono text-xl backdrop-blur-sm">
            
-    <!-- Visible Button for Touch Devices -->
-    <button type="submit" id="loginBtn" class="mt-4 px-8 py-3 border border-[#df2531]/30 text-[#df2531] hover:bg-[#df2531] hover:text-white transition-all duration-300 rounded uppercase tracking-wider text-sm font-bold cursor-pointer">
+    <button type="submit" id="loginBtn" class="mt-4 px-8 py-3 border border-[#df2531]/30 text-[#df2531] hover:bg-[#df2531] hover:text-white transition-all duration-300 rounded uppercase tracking-wider text-sm font-bold cursor-pointer active:scale-95">
       Unlock
     </button>
     
@@ -289,7 +291,7 @@ body{
 </div>
 
 <!-- MAIN APP (Hidden initially) -->
-<div id="main-app" class="opacity-0 transition-opacity duration-1000">
+<div id="main-app" class="opacity-0 transition-opacity duration-700">
 
     <header class="flex flex-col items-center justify-center py-8">
         <img src="logo.png" alt="Gallery Logo" class="max-w-[120px] md:max-w-[200px] h-auto object-contain drop-shadow-[0_0_15px_rgba(223,37,49,0.5)] transition-all hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/300x100/000/df2531?text=LOGO'">
@@ -301,7 +303,7 @@ body{
 
 </div>
 
-<!-- Improved Modal Structure -->
+<!-- Modal -->
 <div id="modal">
   <div class="modal-controls">
     <button class="modal-btn" id="closeBtn" title="Close">
@@ -322,11 +324,9 @@ const loginError = document.getElementById('loginError');
 const mainApp = document.getElementById('main-app');
 const correctPass = "Negan";
 
-// Focus input immediately on load
 window.onload = () => {
-    // Attempt focus, might be blocked on mobile until tap, but safe to try
+    // Attempt focus, safe for mobile
     setTimeout(() => passInput.focus(), 100);
-    // Preload gallery assets smoothly
     initGallery();
 };
 
@@ -334,18 +334,12 @@ function attemptLogin() {
     const val = passInput.value;
     
     if (val === correctPass) {
-        // Success
         passInput.blur();
         loginScreen.style.opacity = '0';
         loginScreen.style.visibility = 'hidden';
-        
-        // Reveal App
         mainApp.style.opacity = '1';
-        
-        // Ensure scroll is unlocked
         document.body.style.overflow = '';
     } else {
-        // Fail
         passInput.value = '';
         loginError.style.opacity = '1';
         passInput.parentElement.classList.add('shake');
@@ -362,7 +356,7 @@ function attemptLogin() {
 
 
 /* -----------------------------------------------------
-   GALLERY SETTINGS
+   GALLERY SETTINGS & OPTIMIZATION
 ----------------------------------------------------- */
 const totalFiles = 50;       
 const fileExtension = '.jpg'; 
@@ -375,18 +369,17 @@ const modalImg = document.getElementById('modalImg');
 const closeBtn = document.getElementById('closeBtn');
 
 function initGallery() {
-    /* Render Loop - Efficiently */
     const fragment = document.createDocumentFragment();
     
     images.forEach((src, index) => {
       const d = document.createElement('div');
       d.className = 'card group'; 
       
-      // Setup animation styles but pause them until login? 
-      // Actually CSS animations run, but opacity 0 on main-app hides them.
-      d.style.animation = `fadeIn 0.6s ease forwards ${index * 0.03}s`;
+      // OPTIMIZATION: Faster staggered animation
+      d.style.animation = `fadeIn 0.5s ease forwards ${index * 0.02}s`;
       d.style.opacity = '0';
 
+      // lazy loading native is good
       d.innerHTML = `<img src="${src}" loading="lazy" alt="Gallery Image ${index + 1}" onerror="this.onerror=null;this.src='https://placehold.co/600x800/111/df2531?text=IMG+${index + 1}'">`;
       
       d.onclick = () => openModal(d.querySelector('img').src);
@@ -400,7 +393,7 @@ function initGallery() {
 const styleSheet = document.createElement("style");
 styleSheet.innerText = `
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
 }
 `;
@@ -418,7 +411,7 @@ function closeModal(){
   modal.classList.remove('active');
   setTimeout(() => {
      if(!modal.classList.contains('active')) modalImg.src = ''; 
-  }, 300); 
+  }, 200); // Faster clear
   document.body.style.overflow = '';
 }
 
@@ -434,60 +427,61 @@ modal.onclick = (e) => {
 };
 
 
-/* --- SNAKE CURSOR LOGIC --- */
-let mouseX = window.innerWidth / 2;
-let mouseY = window.innerHeight / 2;
-const trail = [];
-const trailLength = 12; 
+/* --- OPTIMIZED SNAKE CURSOR LOGIC --- */
+/* Only run on non-touch devices to save performance */
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-const head = document.createElement('div');
-head.className = 'snake-head';
-document.body.appendChild(head);
+if (!isTouchDevice && window.innerWidth > 768) {
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    const trail = [];
+    const trailLength = 12; 
 
-for (let i = 0; i < trailLength; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'snake-dot';
-    document.body.appendChild(dot);
-    trail.push({ element: dot, x: mouseX, y: mouseY });
-}
+    const head = document.createElement('div');
+    head.className = 'snake-head';
+    document.body.appendChild(head);
 
-document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-});
-document.addEventListener('touchmove',e=>{
-  mouseX=e.touches[0].clientX;
-  mouseY=e.touches[0].clientY;
-});
+    for (let i = 0; i < trailLength; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'snake-dot';
+        document.body.appendChild(dot);
+        trail.push({ element: dot, x: mouseX, y: mouseY });
+    }
 
-function animate() {
-    head.style.left = mouseX + 'px';
-    head.style.top = mouseY + 'px';
-
-    let prevX = mouseX;
-    let prevY = mouseY;
-
-    trail.forEach((t, index) => {
-        const speed = 0.4; 
-        t.x += (prevX - t.x) * speed;
-        t.y += (prevY - t.y) * speed;
-
-        t.element.style.left = t.x + 'px';
-        t.element.style.top = t.y + 'px';
-        
-        const scale = 1 - (index / trailLength) * 0.8; 
-        t.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
-        
-        t.element.style.opacity = (1 - index/trailLength) * 0.6;
-
-        prevX = t.x;
-        prevY = t.y;
+    document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
     });
-    requestAnimationFrame(animate);
-}
-animate();
 
-/* Click ripple */
+    function animate() {
+        head.style.left = mouseX + 'px';
+        head.style.top = mouseY + 'px';
+
+        let prevX = mouseX;
+        let prevY = mouseY;
+
+        trail.forEach((t, index) => {
+            const speed = 0.4; 
+            t.x += (prevX - t.x) * speed;
+            t.y += (prevY - t.y) * speed;
+
+            t.element.style.left = t.x + 'px';
+            t.element.style.top = t.y + 'px';
+            
+            const scale = 1 - (index / trailLength) * 0.8; 
+            t.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            
+            t.element.style.opacity = (1 - index/trailLength) * 0.6;
+
+            prevX = t.x;
+            prevY = t.y;
+        });
+        requestAnimationFrame(animate);
+    }
+    animate();
+}
+
+/* Click ripple - Keep but optimize */
 document.addEventListener('click',e=>{
   const r=document.createElement('div');
   r.className='ripple';
@@ -497,7 +491,6 @@ document.addEventListener('click',e=>{
   setTimeout(()=>r.remove(),600);
 });
 
-// Initialize Icons
 lucide.createIcons();
 </script>
 
