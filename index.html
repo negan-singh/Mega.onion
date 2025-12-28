@@ -12,14 +12,19 @@
 :root{
   --red:#df2531;
   --black:#000;
+  --card-bg: #050505;
 }
 
 /* Base */
 body{
   margin:0;
-  background:radial-gradient(circle at center,#1a0505 0%,#000 70%);
+  background:radial-gradient(circle at center,#1a0505 0%,#000 90%);
+  color: white;
+  min-height: 100vh;
   overflow-x:hidden;
   touch-action:manipulation;
+  font-family: 'Courier New', Courier, monospace; 
+  font-family: sans-serif;
   cursor: none; /* CRITICAL: Hides default cursor */
 }
 
@@ -28,59 +33,133 @@ body{
   position:fixed;
   inset:0;
   background:
-    linear-gradient(rgba(0,0,0,0) 50%,rgba(0,0,0,.35) 50%),
-    linear-gradient(90deg,rgba(223,37,49,.08),transparent);
-  background-size:100% 2px,3px 100%;
+    linear-gradient(rgba(0,0,0,0) 50%,rgba(0,0,0,.25) 50%),
+    linear-gradient(90deg,rgba(223,37,49,.03),transparent);
+  background-size:100% 3px,4px 100%;
   pointer-events:none;
   z-index:999;
 }
 
 /* Gallery cards */
 .card{
-  background:#000;
-  border:1px solid #111;
+  background: var(--card-bg);
+  border:1px solid #222;
   overflow:hidden;
-  transition:transform .2s ease, box-shadow .2s ease;
+  border-radius: 12px;
+  position: relative;
+  transition:transform .3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow .3s ease, border-color .3s ease;
   will-change:transform;
-  cursor: none; /* Ensure cursor stays hidden on hover */
+  cursor: none;
+  aspect-ratio: 3/4;
 }
-.card:hover{
+
+.card:hover, .card:active, .card:focus {
   border-color:var(--red);
-  box-shadow:0 0 20px rgba(223,37,49,.45);
-}
-.card:active{
-  transform:scale(.94);
+  box-shadow:0 0 25px rgba(223,37,49,.3);
+  z-index: 10;
+  transform: scale(1.02);
 }
 
 .card img{
   width:100%;
   height:100%;
   object-fit:cover;
-  opacity:.9;
-  transition:transform .4s ease, opacity .3s ease;
-  will-change:transform;
-}
-.card:hover img{
-  transform:scale(1.1);
-  opacity:1;
+  opacity:.8;
+  filter: blur(15px) grayscale(60%);
+  transition:transform .5s ease, opacity .4s ease, filter .4s ease;
+  will-change:transform, filter;
 }
 
-/* Modal */
-#modal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.96);
-  display:none;
-  align-items:center;
-  justify-content:center;
-  z-index:1000;
-  cursor: none;
+.card:hover img, 
+.card:active img {
+  transform:scale(1.1);
+  opacity:1;
+  filter: blur(0) grayscale(0%);
 }
-#modal img{
-  max-width:100%;
-  max-height:100%;
-  border:1px solid rgba(223,37,49,.4);
-  box-shadow:0 0 40px rgba(223,37,49,.5);
+
+/* --- IMPROVED MODAL STYLES --- */
+#modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.95);
+  backdrop-filter: blur(15px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 3000;
+  cursor: none;
+  
+  /* Animation Setup */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+#modal.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#modal img {
+  max-width: 95vw;
+  max-height: 80vh;
+  border-radius: 8px;
+  border: 1px solid rgba(223, 37, 49, 0.3);
+  box-shadow: 0 0 60px rgba(223, 37, 49, 0.15);
+  object-fit: contain;
+  
+  /* Pop Animation */
+  transform: scale(0.95);
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#modal.active img {
+  transform: scale(1);
+}
+
+/* Modal Controls - Simplified (Only Close) */
+.modal-controls {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  display: flex;
+  justify-content: flex-end; /* Aligned to right since only one button */
+  align-items: center;
+  z-index: 3001;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+}
+
+.modal-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  padding: 10px;
+  border-radius: 50%;
+  cursor: none;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-btn:hover {
+  background: var(--red);
+  border-color: var(--red);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px var(--red);
+}
+
+.modal-hint {
+  position: absolute;
+  bottom: 30px;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  pointer-events: none;
 }
 
 /* --- SNAKE CURSOR STYLES --- */
@@ -92,20 +171,21 @@ body{
     position: fixed;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 2001;
-    box-shadow: 0 0 10px var(--red);
+    z-index: 4001;
+    box-shadow: 0 0 15px var(--red);
 }
 
 .snake-dot {
-    width: 10px;
-    height: 10px;
+    width: 8px;
+    height: 8px;
     background: var(--red);
     border-radius: 50%;
     position: fixed;
     transform: translate(-50%, -50%);
     pointer-events: none;
-    z-index: 2000;
-    opacity: 0.8;
+    z-index: 4000;
+    opacity: 0.6;
+    transition: opacity 0.2s;
 }
 
 /* Click ripple */
@@ -116,12 +196,12 @@ body{
   border:2px solid rgba(223,37,49,.7);
   border-radius:50%;
   pointer-events:none;
-  animation:ripple .5s ease-out forwards;
-  z-index:1998;
+  animation:ripple .6s ease-out forwards;
+  z-index:9999;
 }
 @keyframes ripple{
   to{
-    transform:scale(6);
+    transform:scale(8);
     opacity:0;
   }
 }
@@ -132,121 +212,153 @@ body{
 
 <div class="scanlines"></div>
 
-<!-- TOP LOGO -->
-<header class="flex justify-center py-4">
-  <img src="logo.png" class="h-10" alt="">
+<header class="flex flex-col items-center justify-center py-8">
+    <!-- LOGO ADDED HERE -->
+    <img src="logo.png" alt="Gallery Logo" class="max-w-[200px] md:max-w-[300px] h-auto object-contain drop-shadow-[0_0_15px_rgba(223,37,49,0.5)] transition-all hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/300x100/000/df2531?text=LOGO'">
 </header>
 
-<!-- GALLERY -->
-<main class="max-w-7xl mx-auto px-1 pb-20">
-  <div id="gallery" class="grid grid-cols-4 gap-[2px]"></div>
+<main class="max-w-7xl mx-auto px-4 pb-20">
+  <!-- Updated Grid: Always 4 columns as requested -->
+  <div id="gallery" class="grid grid-cols-4 gap-2 md:gap-6"></div>
 </main>
 
-<!-- MODAL -->
+<!-- Improved Modal Structure -->
 <div id="modal">
-  <img id="modalImg">
+  <!-- Top Bar Controls -->
+  <div class="modal-controls">
+    <!-- Removed Download Button -->
+    <button class="modal-btn" id="closeBtn" title="Close">
+      <i data-lucide="x" width="24" height="24"></i>
+    </button>
+  </div>
+
+  <img id="modalImg" src="" alt="Full View">
+  
+  <div class="modal-hint">Tap outside to close</div>
 </div>
 
 <script>
-lucide.createIcons();
+/* -----------------------------------------------------
+   SETTINGS: Yahan update karein
+----------------------------------------------------- */
+const totalFiles = 50;       
+const fileExtension = '.jpg'; 
+const folderPath = 'images/'; 
 
-/* Local images */
-const images = Array.from({length:10},(_,i)=>`images/${i+1}.png`);
+/* Generate Array Automatically */
+const images = Array.from({length: totalFiles}, (_, i) => `${folderPath}${i + 1}${fileExtension}`);
 
 const gallery = document.getElementById('gallery');
 const modal = document.getElementById('modal');
 const modalImg = document.getElementById('modalImg');
+const closeBtn = document.getElementById('closeBtn');
 
-/* Render instantly */
-images.forEach(src=>{
-  const d=document.createElement('div');
-  d.className='card';
-  d.innerHTML=`<img src="${src}" loading="eager">`;
-  d.onclick=()=>openModal(src);
+/* Render Loop */
+images.forEach((src, index) => {
+  const d = document.createElement('div');
+  d.className = 'card group'; 
+  
+  // Stagger animation for entry
+  d.style.animation = `fadeIn 0.5s ease forwards ${index * 0.05}s`;
+  d.style.opacity = '0';
+
+  // Placeholder logic maintained
+  d.innerHTML = `<img src="${src}" loading="lazy" alt="Gallery Image ${index + 1}" onerror="this.onerror=null;this.src='https://placehold.co/600x800/111/df2531?text=IMG+${index + 1}'">`;
+  
+  // Interaction
+  d.onclick = () => openModal(d.querySelector('img').src);
   gallery.appendChild(d);
 });
 
-/* Modal */
-function openModal(src){
-  modalImg.src=src;
-  modal.style.display='flex';
-  history.pushState({m:1},'');
+// Add keyframes for fade in
+const styleSheet = document.createElement("style");
+styleSheet.innerText = `
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-modal.onclick=()=>closeModal();
-function closeModal(){
-  modal.style.display='none';
-  modalImg.src='';
-}
-window.onpopstate=()=>{ if(modal.style.display==='flex') closeModal(); };
+`;
+document.head.appendChild(styleSheet);
 
-/* --- SNAKE CURSOR LOGIC (Effect 42) --- */
+
+/* --- IMPROVED MODAL LOGIC --- */
+function openModal(src){
+  modalImg.src = src;
+  modal.classList.add('active'); // Use class for animation
+  document.body.style.overflow = 'hidden'; // Lock scroll
+}
+
+function closeModal(){
+  modal.classList.remove('active');
+  setTimeout(() => {
+     if(!modal.classList.contains('active')) modalImg.src = ''; 
+  }, 300); // Clear src after fade out
+  document.body.style.overflow = '';
+}
+
+// Close events
+closeBtn.onclick = (e) => {
+  e.stopPropagation();
+  closeModal();
+};
+
+modal.onclick = (e) => {
+  // Close only if clicking the background (backdrop), not the image itself
+  if(e.target === modal) {
+    closeModal();
+  }
+};
+
+
+/* --- SNAKE CURSOR LOGIC --- */
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 const trail = [];
-const trailLength = 18; // Length of the snake
+const trailLength = 12; 
 
-// 1. Create the Main Head
 const head = document.createElement('div');
 head.className = 'snake-head';
 document.body.appendChild(head);
 
-// 2. Create the Trail Segments
 for (let i = 0; i < trailLength; i++) {
     const dot = document.createElement('div');
     dot.className = 'snake-dot';
     document.body.appendChild(dot);
-    // Store reference and coordinates
     trail.push({ element: dot, x: mouseX, y: mouseY });
 }
 
-// 3. Track Mouse
 document.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-});
-
-// 4. Track Touch
-document.addEventListener('touchstart',e=>{
-  mouseX=e.touches[0].clientX;
-  mouseY=e.touches[0].clientY;
 });
 document.addEventListener('touchmove',e=>{
   mouseX=e.touches[0].clientX;
   mouseY=e.touches[0].clientY;
 });
 
-// 5. Animation Loop
 function animate() {
-    // Move Head instantly to mouse (or with slight ease if preferred)
     head.style.left = mouseX + 'px';
     head.style.top = mouseY + 'px';
 
-    // Snake Logic: Each dot follows the point "before" it
-    // We start with the point the head is at (or mouse position)
     let prevX = mouseX;
     let prevY = mouseY;
 
     trail.forEach((t, index) => {
-        // 'speed' determines how tight the snake is. 
-        // 0.4 is snappy, 0.1 is very loose/laggy.
-        const speed = 0.45;
-
-        // Move current dot towards previous dot
+        const speed = 0.35; 
         t.x += (prevX - t.x) * speed;
         t.y += (prevY - t.y) * speed;
 
         t.element.style.left = t.x + 'px';
         t.element.style.top = t.y + 'px';
         
-        // Tapering effect: Shrink dots as they get further back
-        const scale = 1 - (index / trailLength);
+        const scale = 1 - (index / trailLength) * 0.8; 
         t.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
+        
+        t.element.style.opacity = (1 - index/trailLength) * 0.6;
 
-        // Update prev coordinates for the NEXT dot in the loop
         prevX = t.x;
         prevY = t.y;
     });
-
     requestAnimationFrame(animate);
 }
 animate();
@@ -258,8 +370,11 @@ document.addEventListener('click',e=>{
   r.style.left=e.clientX+'px';
   r.style.top=e.clientY+'px';
   document.body.appendChild(r);
-  setTimeout(()=>r.remove(),500);
+  setTimeout(()=>r.remove(),600);
 });
+
+// Initialize Icons
+lucide.createIcons();
 </script>
 
 </body>
