@@ -1,456 +1,196 @@
-<! DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CLASSIFIED ARCHIVE</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2? family=Share+Tech+Mono&display=swap');
-        
-        * { 
-            margin:  0; 
-            padding:  0; 
-            box-sizing: border-box; 
-        }
-        
-        body { 
-            background:  #000;
-            color: #fff;
-            font-family:  'Share Tech Mono', 'Courier New', monospace;
-            overflow-x: hidden;
-            position: relative;
-        }
-        
-        /* Noise/grain texture */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom:  0;
-            background-image: 
-                repeating-linear-gradient(0deg, rgba(255,0,0,0.03) 0px, transparent 1px, transparent 2px, rgba(255,0,0,0.03) 3px),
-                repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0px, transparent 1px, transparent 2px, rgba(0,0,0,0.2) 3px);
-            pointer-events: none;
-            z-index: 9999;
-            animation: flicker 0.15s infinite;
-        }
-        
-        @keyframes flicker {
-            0% { opacity: 0.95; }
-            50% { opacity: 1; }
-            100% { opacity: 0.97; }
-        }
-        
-        /* Vignette */
-        body::after {
-            content: '';
-            position: fixed;
-            top:  0; left: 0; right: 0; bottom: 0;
-            background: radial-gradient(ellipse at center, transparent 30%, #000 100%);
-            pointer-events:  none;
-            z-index:  9998;
-        }
-        
-        /* Header - Centered */
-        header {
-            padding: 25px 20px;
-            border-bottom: 2px solid #1a0000;
-            margin-bottom: 40px;
-            text-align: center;
-            background: linear-gradient(180deg, #0a0000 0%, #000 100%);
-            box-shadow: 0 2px 0 #ff0000, 0 4px 20px rgba(255,0,0,0.2);
-        }
-        
-        .logo-wrap {
-            position:  relative;
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 15px;
-            display: inline-block;
-        }
-        
-        .logo-wrap::before,
-        .logo-wrap::after {
-            content:  '';
-            position: absolute;
-            border: 1px solid #ff0000;
-        }
-        
-        .logo-wrap::before {
-            inset: -6px;
-            animation: rotate 10s linear infinite;
-        }
-        
-        .logo-wrap::after {
-            inset:  -10px;
-            animation: rotate 15s linear infinite reverse;
-        }
-        
-        @keyframes rotate {
-            from { transform:  rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .logo-img {
-            width:  100%;
-            height: 100%;
-            object-fit:  cover;
-            filter: grayscale(0.6) contrast(1.2) brightness(1.8);
-            border:  2px solid #ff0000;
-            clip-path: polygon(10% 0, 90% 0, 100% 10%, 100% 90%, 90% 100%, 10% 100%, 0 90%, 0 10%);
-            position: relative;
-            z-index: 5;
-        }
-        
-        h1 {
-            font-size: clamp(22px, 5vw, 38px);
-            letter-spacing: clamp(6px, 3vw, 16px);
-            font-weight: 400;
-            text-transform: uppercase;
-            color: #ff0000;
-            text-shadow: 
-                2px 2px 0 #000,
-                0 0 20px rgba(255, 0, 0, 0.8),
-                0 0 40px rgba(255, 0, 0, 0.4);
-            margin: 15px 0 10px;
-            position: relative;
-            display: inline-block;
-        }
-        
-        h1::before,
-        h1::after {
-            content: '▰';
-            position: absolute;
-            color: #ff0000;
-            font-size: 0.4em;
-            animation: blink 1.5s infinite;
-        }
-        
-        h1::before { left: -25px; }
-        h1::after { right: -25px; }
-        
-        @keyframes blink {
-            0%, 49%, 100% { opacity: 1; }
-            50%, 99% { opacity: 0; }
-        }
-        
-        .status {
-            font-size: clamp(7px, 2vw, 10px);
-            color: #666;
-            letter-spacing: 2px;
-            margin-top:  12px;
-            border:  1px solid #1a0000;
-            display: inline-block;
-            padding: 5px 15px;
-            background: #050505;
-            box-shadow: inset 0 0 10px rgba(255,0,0,0.1);
-        }
-        
-        .status::before {
-            content: '⚠ ';
-            color: #ff0000;
-            animation: blink 2s infinite;
-        }
-        
-        /* Gallery */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            max-width: 1600px;
-            margin: 0 auto;
-        }
-        
-        @media (max-width: 768px) {
-            .gallery {
-                grid-template-columns:  1fr;
-                gap: 25px;
-                padding: 15px;
-            }
-            .logo-wrap { 
-                width: 60px; 
-                height: 60px; 
-            }
-        }
-        
-        /* Card */
-        .card {
-            background: #000;
-            border:  1px solid #1a0000;
-            overflow: hidden;
-            transition: all 0.3s ease;
-            position: relative;
-            box-shadow: 0 0 0 1px #0a0a0a;
-        }
-        
-        .card::before {
-            content: '';
-            position: absolute;
-            inset: -1px;
-            background: linear-gradient(45deg, #ff0000, transparent, transparent, transparent);
-            opacity: 0;
-            transition: opacity 0.3s;
-            z-index: 0;
-        }
-        
-        .card:hover {
-            border-color: #ff0000;
-            box-shadow: 
-                0 0 20px rgba(255, 0, 0, 0.3),
-                inset 0 0 20px rgba(255, 0, 0, 0.05);
-            transform: translateY(-3px);
-        }
-        
-        .card:hover::before {
-            opacity:  0.3;
-        }
-        
-        /* Video Box */
-        .vid-box {
-            position: relative;
-            aspect-ratio: 16/9;
-            background: #000;
-            overflow: hidden;
-            border-bottom: 1px solid #0a0a0a;
-        }
-        
-        .loading {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: #ff0000;
-            font-size: 11px;
-            letter-spacing: 4px;
-            z-index: 10;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-            animation: pulse-loading 1. 5s infinite;
-        }
-        
-        @keyframes pulse-loading {
-            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
-            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(0.95); }
-        }
-        
-        video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            filter: blur(30px) brightness(0.2) contrast(1.3) grayscale(0.5);
-            transition: all 0.5s ease;
-            position: relative;
-            z-index: 1;
-        }
-        
-        .card:hover video {
-            filter:  blur(0) brightness(1) contrast(1) grayscale(0);
-        }
-        
-        /* Info Bar */
-        .info {
-            padding: 12px 15px;
-            font-size: 10px;
-            color: #444;
-            background: #000;
-            border-top: 1px solid #ff0000;
-            font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 2px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative;
-            z-index: 2;
-        }
-        
-        .info::before {
-            content: '▶';
-            color: #ff0000;
-            margin-right: 10px;
-            font-size: 8px;
-        }
-        
-        .info::after {
-            content: '◼';
-            color: #ff0000;
-            font-size: 6px;
-            animation: blink 3s infinite;
-        }
-        
-        .error-msg {
-            color: #ff0000;
-            font-size:  11px;
-            text-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
-            letter-spacing: 3px;
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: #000;
-            border-left: 1px solid #1a0000;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #ff0000;
-            border:  2px solid #000;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #cc0000;
-        }
-        
-        /* Mobile */
-        @media (max-width: 768px) {
-            h1 { letter-spacing: 6px; }
-            .status { font-size: 7px; padding: 4px 12px; }
-            video { filter: blur(15px) brightness(0.3) contrast(1.2) grayscale(0.5); }
-        }
-        
-        body {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            user-select: none;
-        }
-        
-        /* Corner marks */
-        header::before,
-        header::after {
-            content: '◢';
-            position: absolute;
-            color: #ff0000;
-            font-size: 18px;
-            opacity: 0.3;
-        }
-        
-        header::before {
-            top:  10px;
-            left: 10px;
-        }
-        
-        header::after {
-            top: 10px;
-            right: 10px;
-            transform: scaleX(-1);
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title></title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+<!-- Icons -->
+<script src="https://unpkg.com/lucide@latest"></script>
+
+<style>
+:root{
+  --red:#df2531;
+  --black:#000000;
+}
+
+/* Base */
+body{
+  margin:0;
+  background:radial-gradient(circle at center,#1a0505 0%,#000 70%);
+  overflow-x:hidden;
+}
+
+/* Scanlines (tension) */
+.scanlines{
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(rgba(0,0,0,0) 50%,rgba(0,0,0,.35) 50%),
+    linear-gradient(90deg,rgba(223,37,49,.08),transparent);
+  background-size:100% 2px,3px 100%;
+  pointer-events:none;
+  z-index:999;
+}
+
+/* Scroll glow (engagement) */
+.scroll-glow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  background:radial-gradient(circle at center,rgba(223,37,49,.14),transparent 70%);
+  opacity:0;
+  transition:.15s;
+  z-index:10;
+}
+
+/* Cards */
+.card{
+  background:#000;
+  border:1px solid #111;
+  overflow:hidden;
+  transition:.25s ease;
+  will-change:transform, box-shadow;
+}
+.card:hover{
+  border-color:var(--red);
+  box-shadow:0 0 18px rgba(223,37,49,.45);
+}
+.card:active{
+  transform:scale(.95);
+  box-shadow:0 0 35px rgba(223,37,49,.7);
+}
+
+/* Images */
+.card img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:.85;
+  transition:.6s ease;
+  filter:contrast(1) saturate(1);
+}
+.card:hover img,
+.card:active img{
+  opacity:1;
+  transform:scale(1.12);
+  filter:contrast(1.15) saturate(1.2);
+}
+
+/* Pulse on hover (heartbeat mimic) */
+@keyframes pulseRed{
+  0%{ box-shadow:0 0 10px rgba(223,37,49,.3); }
+  50%{ box-shadow:0 0 30px rgba(223,37,49,.6); }
+  100%{ box-shadow:0 0 10px rgba(223,37,49,.3); }
+}
+.card:hover{ animation:pulseRed 1.6s infinite; }
+
+/* Modal */
+#modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.96);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:1000;
+}
+#modal img{
+  max-width:100%;
+  max-height:100%;
+  border:1px solid rgba(223,37,49,.4);
+  box-shadow:0 0 40px rgba(223,37,49,.45);
+}
+</style>
 </head>
-<body oncontextmenu="return false;">
 
-    <header>
-        <div class="logo-wrap">
-            <img src="logo.jpg" class="logo-img" alt="[REDACTED]" onerror="this.style.display='none'">
-        </div>
-        <h1>CLASSIFIED ARCHIVE</h1>
-        <div class="status">AUTHORIZED ACCESS ONLY • CLEARANCE LEVEL: RESTRICTED</div>
-    </header>
+<body>
 
-    <div class="gallery" id="manualGallery"></div>
+<div class="scanlines"></div>
+<div class="scroll-glow" id="scrollGlow"></div>
 
-    <script>
-        const container = document.getElementById('manualGallery');
-        
-        // ✅ SOLUTION: Git LFS Media URL
-        const owner = "negan-singh";
-        const repo = "On-Testing. Onion";
-        const branch = "main";
-        
-        // Git LFS proper URL
-        const folder = `https://media.githubusercontent.com/media/${owner}/${repo}/${branch}/White-Kyle/`;
-        
-        const totalVideos = 84;
-        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        
-        // Generate gallery
-        for (let i = 1; i <= totalVideos; i++) {
-            const card = document.createElement('div');
-            card.className = 'card';
-            
-            const videoPath = `${folder}${i}.mp4`;
-            const paddedNum = String(i).padStart(3, '0');
-            
-            const preloadType = isMobile ? 'none' : 'metadata';
-            
-            card.innerHTML = `
-                <div class="vid-box">
-                    <div class="loading">◉ LOADING ◉</div>
-                    <video 
-                        controls 
-                        preload="${preloadType}"
-                        playsinline
-                        crossorigin="anonymous"
-                        onloadedmetadata="videoLoaded(this)"
-                        onerror="handleVideoError(this)"
-                        controlsList="nodownload"
-                    >
-                        <source src="${videoPath}" type="video/mp4">
-                    </video>
-                </div>
-                <div class="info">
-                    <span>FILE_${paddedNum}. MP4</span>
-                </div>
-            `;
-            container.appendChild(card);
-        }
-        
-        function videoLoaded(video) {
-            const loadingDiv = video.parentElement. querySelector('.loading');
-            if (loadingDiv) {
-                loadingDiv.style.display = 'none';
-            }
-            console.log('✅ Loaded:', video.querySelector('source').src);
-        }
-        
-        function handleVideoError(video) {
-            const loadingDiv = video.previousElementSibling;
-            const videoSrc = video.querySelector('source').src;
-            
-            if (loadingDiv) {
-                loadingDiv.innerHTML = '<span class="error-msg">⚠ FILE NOT FOUND</span>';
-            }
-            
-            console.error('❌ Failed:', videoSrc);
-        }
-        
-        // Mobile lazy loading
-        if (isMobile) {
-            const observerOptions = {
-                root: null,
-                rootMargin: '50px',
-                threshold: 0.1
-            };
-            
-            const videoObserver = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        const video = entry.target;
-                        if (video.tagName === 'VIDEO' && ! video.dataset.loaded) {
-                            video.load();
-                            video.dataset. loaded = 'true';
-                        }
-                    }
-                });
-            }, observerOptions);
-            
-            setTimeout(() => {
-                document.querySelectorAll('video').forEach(video => {
-                    videoObserver.observe(video);
-                });
-            }, 100);
-        }
-        
-        // Security
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.key === 'F12' || (e.ctrlKey && e. shiftKey && e.key === 'I')) {
-                e.preventDefault();
-            }
-        });
-        
-        console.log('🔍 Video URL format:', folder + '1.mp4');
-    </script>
+<!-- TOP LOGO -->
+<header class="flex justify-center py-4">
+  <img src="logo.png" class="h-10" alt="">
+</header>
+
+<!-- CENTER ICON (fixation point) -->
+<div class="flex justify-center mb-3">
+  <i data-lucide="aperture" class="w-9 h-9 text-[#df2531]"></i>
+</div>
+
+<!-- GALLERY (MOBILE: 4 COLUMNS FORCED) -->
+<main class="max-w-7xl mx-auto px-1 pb-20">
+  <div id="gallery" class="grid grid-cols-4 gap-[2px] md:grid-cols-4 md:gap-3"></div>
+</main>
+
+<!-- MODAL -->
+<div id="modal">
+  <img id="modalImg" alt="">
+</div>
+
+<script>
+lucide.createIcons();
+
+/* Images */
+const images=[
+  'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
+  'https://images.unsplash.com/photo-1550751827-4bd374c3f58b',
+  'https://images.unsplash.com/photo-1516259762381-22954d7d3ad2',
+  'https://images.unsplash.com/photo-1515630278258-407f66498911',
+  'https://images.unsplash.com/photo-1478760329108-5c3ed9d495a0',
+  'https://images.unsplash.com/photo-1558494949-efc5e60dc549',
+  'https://images.unsplash.com/photo-1563206767-5b1d97289374',
+  'https://images.unsplash.com/photo-1451187580459-43490279c0fa'
+];
+
+const gallery=document.getElementById('gallery');
+const modal=document.getElementById('modal');
+const modalImg=document.getElementById('modalImg');
+const glow=document.getElementById('scrollGlow');
+
+/* Render fast */
+images.forEach(src=>{
+  const d=document.createElement('div');
+  d.className='card';
+  d.innerHTML=`<img src="${src}" loading="lazy" decoding="async">`;
+  d.onclick=()=>{
+    // anticipation delay (dopamine)
+    d.style.transform='scale(.96)';
+    setTimeout(()=>{
+      openModal(src);
+      d.style.transform='';
+    },140);
+  };
+  gallery.appendChild(d);
+});
+
+/* Modal + Back button */
+function openModal(src){
+  modalImg.src=src;
+  modal.style.display='flex';
+  history.pushState({modal:true},'');
+}
+function closeModal(){
+  modal.style.display='none';
+  modalImg.src='';
+}
+modal.onclick=closeModal;
+
+/* Back button closes modal */
+window.onpopstate=()=>{
+  if(modal.style.display==='flex') closeModal();
+};
+
+/* Scroll engagement glow */
+window.addEventListener('scroll',()=>{
+  glow.style.opacity='1';
+  clearTimeout(window._sg);
+  window._sg=setTimeout(()=>glow.style.opacity='0',120);
+});
+</script>
+
 </body>
 </html>
