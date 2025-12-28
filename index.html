@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title></title>
+<title>Gallery</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
@@ -20,6 +20,7 @@ body{
   background:radial-gradient(circle at center,#1a0505 0%,#000 70%);
   overflow-x:hidden;
   touch-action:manipulation;
+  cursor: none; /* CRITICAL: Hides default cursor */
 }
 
 /* Scanlines */
@@ -41,6 +42,7 @@ body{
   overflow:hidden;
   transition:transform .2s ease, box-shadow .2s ease;
   will-change:transform;
+  cursor: none; /* Ensure cursor stays hidden on hover */
 }
 .card:hover{
   border-color:var(--red);
@@ -72,6 +74,7 @@ body{
   align-items:center;
   justify-content:center;
   z-index:1000;
+  cursor: none;
 }
 #modal img{
   max-width:100%;
@@ -80,27 +83,29 @@ body{
   box-shadow:0 0 40px rgba(223,37,49,.5);
 }
 
-/* CURSOR SYSTEM */
-.cursor-core{
-  position:fixed;
-  width:8px;
-  height:8px;
-  background:var(--red);
-  border-radius:50%;
-  pointer-events:none;
-  z-index:2000;
-  transform:translate(-50%,-50%);
+/* --- SNAKE CURSOR STYLES --- */
+.snake-head {
+    width: 12px;
+    height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 2001;
+    box-shadow: 0 0 10px var(--red);
 }
-.cursor-ring{
-  position:fixed;
-  width:36px;
-  height:36px;
-  border:1px solid rgba(223,37,49,.5);
-  border-radius:50%;
-  pointer-events:none;
-  z-index:1999;
-  transform:translate(-50%,-50%);
-  box-shadow:0 0 30px rgba(223,37,49,.4);
+
+.snake-dot {
+    width: 10px;
+    height: 10px;
+    background: var(--red);
+    border-radius: 50%;
+    position: fixed;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 2000;
+    opacity: 0.8;
 }
 
 /* Click ripple */
@@ -127,16 +132,10 @@ body{
 
 <div class="scanlines"></div>
 
-<!-- CURSOR -->
-<div class="cursor-ring" id="ring"></div>
-<div class="cursor-core" id="core"></div>
-
 <!-- TOP LOGO -->
 <header class="flex justify-center py-4">
   <img src="logo.png" class="h-10" alt="">
 </header>
-
-
 
 <!-- GALLERY -->
 <main class="max-w-7xl mx-auto px-1 pb-20">
@@ -180,37 +179,77 @@ function closeModal(){
 }
 window.onpopstate=()=>{ if(modal.style.display==='flex') closeModal(); };
 
-/* CURSOR LOGIC */
-const core=document.getElementById('core');
-const ring=document.getElementById('ring');
-let x=0,y=0,tx=0,ty=0;
+/* --- SNAKE CURSOR LOGIC (Effect 42) --- */
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+const trail = [];
+const trailLength = 18; // Length of the snake
 
-function animate(){
-  x+=(tx-x)*0.2;
-  y+=(ty-y)*0.2;
-  core.style.left=x+'px';
-  core.style.top=y+'px';
-  ring.style.left=x+'px';
-  ring.style.top=y+'px';
-  requestAnimationFrame(animate);
+// 1. Create the Main Head
+const head = document.createElement('div');
+head.className = 'snake-head';
+document.body.appendChild(head);
+
+// 2. Create the Trail Segments
+for (let i = 0; i < trailLength; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'snake-dot';
+    document.body.appendChild(dot);
+    // Store reference and coordinates
+    trail.push({ element: dot, x: mouseX, y: mouseY });
 }
-animate();
 
-/* Mouse */
-document.addEventListener('mousemove',e=>{
-  tx=e.clientX;
-  ty=e.clientY;
+// 3. Track Mouse
+document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
 });
 
-/* Touch */
+// 4. Track Touch
 document.addEventListener('touchstart',e=>{
-  tx=e.touches[0].clientX;
-  ty=e.touches[0].clientY;
+  mouseX=e.touches[0].clientX;
+  mouseY=e.touches[0].clientY;
 });
 document.addEventListener('touchmove',e=>{
-  tx=e.touches[0].clientX;
-  ty=e.touches[0].clientY;
+  mouseX=e.touches[0].clientX;
+  mouseY=e.touches[0].clientY;
 });
+
+// 5. Animation Loop
+function animate() {
+    // Move Head instantly to mouse (or with slight ease if preferred)
+    head.style.left = mouseX + 'px';
+    head.style.top = mouseY + 'px';
+
+    // Snake Logic: Each dot follows the point "before" it
+    // We start with the point the head is at (or mouse position)
+    let prevX = mouseX;
+    let prevY = mouseY;
+
+    trail.forEach((t, index) => {
+        // 'speed' determines how tight the snake is. 
+        // 0.4 is snappy, 0.1 is very loose/laggy.
+        const speed = 0.45;
+
+        // Move current dot towards previous dot
+        t.x += (prevX - t.x) * speed;
+        t.y += (prevY - t.y) * speed;
+
+        t.element.style.left = t.x + 'px';
+        t.element.style.top = t.y + 'px';
+        
+        // Tapering effect: Shrink dots as they get further back
+        const scale = 1 - (index / trailLength);
+        t.element.style.transform = `translate(-50%, -50%) scale(${scale})`;
+
+        // Update prev coordinates for the NEXT dot in the loop
+        prevX = t.x;
+        prevY = t.y;
+    });
+
+    requestAnimationFrame(animate);
+}
+animate();
 
 /* Click ripple */
 document.addEventListener('click',e=>{
