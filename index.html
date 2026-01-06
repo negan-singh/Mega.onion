@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Content</title>
+    <title>MEGA SYSTEM INTERFACE</title>
+    
+    <link rel="icon" type="image/png" href="fav.png">
+
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             cursor: none;
-            /* Disable text selection */
+            /* Text selection block */
             user-select: none;
             -webkit-user-select: none;
         }
@@ -26,7 +29,7 @@
             color: #00ff00;
         }
 
-        /* Fixed Deep Blur Background */
+        /* Deep Blur Background */
         .glass-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -143,7 +146,9 @@
         }
     </style>
 </head>
-<body oncontextmenu="return false;"> <div id="custom-cursor"></div>
+<body oncontextmenu="return false;">
+
+    <div id="custom-cursor"></div>
     <div class="mega-watermark">MEGA</div>
     <div class="glass-overlay"></div>
 
@@ -190,20 +195,19 @@
         document.addEventListener('mousemove', handleMove);
         document.addEventListener('touchmove', handleMove);
 
-        // Security Script: Block Keyboard Shortcuts
+        // Security: Block Keyboard Shortcuts
         document.addEventListener('keydown', function(e) {
-            // Block Ctrl+S, Ctrl+U, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C, F12
             if (
                 e.keyCode === 123 || // F12
-                (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || // Ctrl+Shift+I/J/C
-                (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83 || e.keyCode === 65 || e.keyCode === 70)) // Ctrl+U/S/A/F
+                (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) || // Inspect
+                (e.ctrlKey && (e.keyCode === 85 || e.keyCode === 83 || e.keyCode === 65 || e.keyCode === 70)) // View Source, Save, Select All, Find
             ) {
                 e.preventDefault();
                 return false;
             }
         });
 
-        // Panel Switch Logic
+        // 4 Second Logic
         window.onload = () => {
             setTimeout(() => {
                 progressBar.style.width = '100%';
