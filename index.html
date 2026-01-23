@@ -1,1 +1,163 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Stream Player</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #fff;
+            overflow: hidden; /* Scroll band */
+        }
+
+        .player-container {
+            position: relative;
+            width: 100%;
+            max-width: 900px; /* PC ke liye max width */
+            background: #000;
+            /* Mobile par side borders hatane ke liye */
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* Responsive 16:9 Aspect Ratio */
+        .video-box {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%; /* 16:9 Ratio */
+            height: 0;
+            background: #111;
+        }
+
+        iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        /* 🛡️ CORNER MASKS (Invisible Stickers) */
+        /* Hum absolute positioning use karenge taaki ye sirf konon me rahein */
+
+        .mask {
+            position: absolute;
+            z-index: 50; /* Iframe ke upar */
+            background: rgba(0,0,0,0); /* Invisible */
+            /* Debugging ke liye neeche wali line uncomment karein agar mask dekhna ho: */
+            /* background: rgba(255, 0, 0, 0.3); */ 
+        }
+
+        /* Top Right: Share Button Blocker */
+        .mask-top-right {
+            top: 0;
+            right: 0;
+            width: 25%;  /* Screen ka 25% cover karega */
+            height: 20%; /* Height kam rakhi hai taaki play button na dhake */
+        }
+
+        /* Top Left: Logo Blocker */
+        .mask-top-left {
+            top: 0;
+            left: 0;
+            width: 20%;
+            height: 20%;
+        }
+
+        /* Optional: Bottom Right (Settings/Fullscreen blocker if needed) */
+        /* Isko hataya ja sakta hai agar user ko settings change karne dena hai */
+        .mask-bottom-right {
+            bottom: 0;
+            right: 0;
+            width: 15%;
+            height: 15%;
+        }
+
+        /* Mobile specific message */
+        .mobile-hint {
+            position: absolute;
+            bottom: -30px;
+            width: 100%;
+            text-align: center;
+            font-family: sans-serif;
+            font-size: 12px;
+            color: #555;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;">
+
+    <div class="player-container">
+        <div class="video-box">
+            
+            <div class="mask mask-top-right" onclick="blockAlert()"></div>
+            <div class="mask mask-top-left"></div>
+            <iframe 
+                src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" 
+                allowfullscreen>
+            </iframe>
+        </div>
+        <div class="mobile-hint">Tap center to Play • Secure Mode</div>
+    </div>
+
+    <script>
+        // Sirf user ko batane ke liye ki yahan click allowed nahi hai
+        function blockAlert() {
+            console.log("Share attempt blocked");
+            // Hum alert nahi dikhayenge taaki experience smooth rahe, 
+            // bas click waste ho jayega.
+        }
+    </script>
+
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
+</body>
+</html>
