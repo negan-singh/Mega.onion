@@ -1,43 +1,75 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Mobile Stream Player</title>
+    <title>Secure Video Gallery</title>
     <style>
-        * {
-            box-sizing: border-box;
+        /* --- 1. Base Dark Theme --- */
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --text-color: #f1f5f9;
+            --accent: #38bdf8;
         }
 
         body {
-            background-color: #000;
             margin: 0;
             padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
+
+        header {
+            text-align: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid #334155;
+            backdrop-filter: blur(5px);
+        }
+
+        h1 { margin: 0; font-size: 1.2rem; }
+        p { margin: 5px 0 0; font-size: 0.8rem; color: #94a3b8; }
+
+        /* --- 2. The Grid Layout (Mobile & PC Friendly) --- */
+        .gallery-container {
+            display: grid;
+            /* Auto-fit: PC pe 2-3 col, Mobile pe 1 col automatically */
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* --- 3. Individual Video Card --- */
+        .video-card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
+            border: 1px solid #334155;
+        }
+
+        .card-header {
+            padding: 10px 15px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            border-bottom: 1px solid #334155;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #fff;
-            overflow: hidden; /* Scroll band */
+            justify-content: space-between;
         }
 
-        .player-container {
+        /* --- 4. The Protected Video Wrapper --- */
+        .video-wrapper {
             position: relative;
             width: 100%;
-            max-width: 900px; /* PC ke liye max width */
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio maintain karega */
             background: #000;
-            /* Mobile par side borders hatane ke liye */
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
-        }
-
-        /* Responsive 16:9 Aspect Ratio */
-        .video-box {
-            position: relative;
-            width: 100%;
-            padding-bottom: 56.25%; /* 16:9 Ratio */
-            height: 0;
-            background: #111;
         }
 
         iframe {
@@ -46,118 +78,139 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: 0;
+            border: none;
         }
 
-        /* 🛡️ CORNER MASKS (Invisible Stickers) */
-        /* Hum absolute positioning use karenge taaki ye sirf konon me rahein */
-
+        /* --- 5. 🛡️ SECURITY MASKS (Har box ke liye apply honge) --- */
         .mask {
             position: absolute;
-            z-index: 50; /* Iframe ke upar */
-            background: rgba(0,0,0,0); /* Invisible */
-            /* Debugging ke liye neeche wali line uncomment karein agar mask dekhna ho: */
-            /* background: rgba(255, 0, 0, 0.3); */ 
+            z-index: 20; /* Iframe ke upar */
+            background: transparent; /* Invisible */
+            /* background: rgba(255,0,0,0.3); /* Debugging ke liye uncomment karein */
         }
 
-        /* Top Right: Share Button Blocker */
-        .mask-top-right {
+        /* Right Side Mask (Blocks Share Button) */
+        .mask-right {
             top: 0;
             right: 0;
-            width: 25%;  /* Screen ka 25% cover karega */
-            height: 20%; /* Height kam rakhi hai taaki play button na dhake */
+            width: 20%;
+            height: 60px;
         }
 
-        /* Top Left: Logo Blocker */
-        .mask-top-left {
+        /* Left Side Mask (Blocks Mega Logo) */
+        .mask-left {
             top: 0;
             left: 0;
-            width: 20%;
-            height: 20%;
-        }
-
-        /* Optional: Bottom Right (Settings/Fullscreen blocker if needed) */
-        /* Isko hataya ja sakta hai agar user ko settings change karne dena hai */
-        .mask-bottom-right {
-            bottom: 0;
-            right: 0;
             width: 15%;
-            height: 15%;
+            height: 60px;
         }
 
-        /* Mobile specific message */
-        .mobile-hint {
-            position: absolute;
-            bottom: -30px;
-            width: 100%;
-            text-align: center;
-            font-family: sans-serif;
-            font-size: 12px;
-            color: #555;
-        }
     </style>
 </head>
 <body oncontextmenu="return false;">
 
-    <div class="player-container">
-        <div class="video-box">
-            
-            <div class="mask mask-top-right" onclick="blockAlert()"></div>
-            <div class="mask mask-top-left"></div>
-            <iframe 
-                src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" 
-                allowfullscreen>
-            </iframe>
+    <header>
+        <h1>My Premium Course</h1>
+        <p>8 Videos • Secure Access</p>
+    </header>
+
+    <div class="gallery-container">
+
+        <div class="video-card">
+            <div class="card-header">
+                <span>01. Introduction</span>
+                <span style="color: var(--accent);">▶</span>
+            </div>
+            <div class="video-wrapper">
+                <div class="mask mask-right"></div> <div class="mask mask-left"></div>  <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
+            </div>
         </div>
-        <div class="mobile-hint">Tap center to Play • Secure Mode</div>
+
+        <div class="video-card">
+            <div class="card-header">
+                <span>02. System Setup</span>
+                <span style="color: var(--accent);">▶</span>
+            </div>
+            <div class="video-wrapper">
+                <div class="mask mask-right"></div>
+                <div class="mask mask-left"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="card-header">
+                <span>03. Basic Commands</span>
+                <span style="color: var(--accent);">▶</span>
+            </div>
+            <div class="video-wrapper">
+                <div class="mask mask-right"></div>
+                <div class="mask mask-left"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="card-header">
+                <span>04. Network Scanning</span>
+                <span style="color: var(--accent);">▶</span>
+            </div>
+            <div class="video-wrapper">
+                <div class="mask mask-right"></div>
+                <div class="mask mask-left"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="card-header">
+                <span>05. Vulnerability Analysis</span>
+                <span style="color: var(--accent);">▶</span>
+            </div>
+            <div class="video-wrapper">
+                <div class="mask mask-right"></div>
+                <div class="mask mask-left"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="card-header">
+                <span>06. Web Exploitation</span>
+                <span style="color: var(--accent);">▶</span>
+            </div>
+            <div class="video-wrapper">
+                <div class="mask mask-right"></div>
+                <div class="mask mask-left"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="card-header">
+                <span>07. Post Exploitation</span>
+                <span style="color: var(--accent);">▶</span>
+            </div>
+            <div class="video-wrapper">
+                <div class="mask mask-right"></div>
+                <div class="mask mask-left"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
+            </div>
+        </div>
+
+        <div class="video-card">
+            <div class="card-header">
+                <span>08. Final Review</span>
+                <span style="color: var(--accent);">▶</span>
+            </div>
+            <div class="video-wrapper">
+                <div class="mask mask-right"></div>
+                <div class="mask mask-left"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
+            </div>
+        </div>
+
     </div>
 
-    <script>
-        // Sirf user ko batane ke liye ki yahan click allowed nahi hai
-        function blockAlert() {
-            console.log("Share attempt blocked");
-            // Hum alert nahi dikhayenge taaki experience smooth rahe, 
-            // bas click waste ho jayega.
-        }
-    </script>
-
-<!-- Code injected by live-server -->
-<script>
-	// <![CDATA[  <-- For SVG support
-	if ('WebSocket' in window) {
-		(function () {
-			function refreshCSS() {
-				var sheets = [].slice.call(document.getElementsByTagName("link"));
-				var head = document.getElementsByTagName("head")[0];
-				for (var i = 0; i < sheets.length; ++i) {
-					var elem = sheets[i];
-					var parent = elem.parentElement || head;
-					parent.removeChild(elem);
-					var rel = elem.rel;
-					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
-						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
-						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
-					}
-					parent.appendChild(elem);
-				}
-			}
-			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
-			var address = protocol + window.location.host + window.location.pathname + '/ws';
-			var socket = new WebSocket(address);
-			socket.onmessage = function (msg) {
-				if (msg.data == 'reload') window.location.reload();
-				else if (msg.data == 'refreshcss') refreshCSS();
-			};
-			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
-				console.log('Live reload enabled.');
-				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
-			}
-		})();
-	}
-	else {
-		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
-	}
-	// ]]>
-</script>
 </body>
 </html>
