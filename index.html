@@ -3,72 +3,66 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Secure Video Gallery</title>
+    <title>3-Column Secure Grid</title>
     <style>
-        /* --- 1. Base Dark Theme --- */
+        /* --- 1. Base Reset & Dark Theme --- */
         :root {
-            --bg-color: #0f172a;
-            --card-bg: #1e293b;
-            --text-color: #f1f5f9;
-            --accent: #38bdf8;
+            --bg-main: #000000;
+            --card-border: #222;
+            --text-color: #fff;
+            --accent-color: #00d26a; /* MEGA style green for highlights */
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent; /* Removes blue tap box on Android */
         }
 
         body {
             margin: 0;
             padding: 0;
-            background-color: var(--bg-color);
+            background-color: var(--bg-main);
             color: var(--text-color);
-            font-family: 'Segoe UI', Roboto, sans-serif;
+            font-family: sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scroll */
         }
 
+        /* Simple Header */
         header {
             text-align: center;
-            padding: 20px;
-            background: rgba(15, 23, 42, 0.95);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            border-bottom: 1px solid #334155;
-            backdrop-filter: blur(5px);
+            padding: 12px;
+            background: #0a0a0a;
+            border-bottom: 1px solid var(--card-border);
         }
+        h1 { margin: 0; font-size: 1rem; font-weight: 600; }
+        p { margin: 4px 0 0; font-size: 0.75rem; color: #888; }
+        .secure-badge { color: var(--accent-color); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; }
 
-        h1 { margin: 0; font-size: 1.2rem; }
-        p { margin: 5px 0 0; font-size: 0.8rem; color: #94a3b8; }
-
-        /* --- 2. The Grid Layout (Mobile & PC Friendly) --- */
-        .gallery-container {
+        /* --- 2. THE 3-COLUMN GRID SETUP --- */
+        .grid-container {
             display: grid;
-            /* Auto-fit: PC pe 2-3 col, Mobile pe 1 col automatically */
-            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-            gap: 20px;
-            padding: 20px;
-            max-width: 1200px;
+            /* ⚠️ STRICT RULE: Always 3 columns, even on small mobiles */
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px; /* Gap bahut kam rakha hai taaki video ko jagah mile */
+            padding: 5px;
+            max-width: 800px; /* PC par zyada failne se rokna */
             margin: 0 auto;
         }
 
-        /* --- 3. Individual Video Card --- */
+        /* --- 3. Video Card Wrapper --- */
         .video-card {
-            background: var(--card-bg);
-            border-radius: 12px;
+            position: relative;
+            background: #111;
+            border-radius: 4px; /* Thoda sa rounded corner */
             overflow: hidden;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-            border: 1px solid #334155;
+            border: 1px solid var(--card-border);
         }
 
-        .card-header {
-            padding: 10px 15px;
-            font-size: 0.9rem;
-            font-weight: 600;
-            border-bottom: 1px solid #334155;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        /* --- 4. The Protected Video Wrapper --- */
-        .video-wrapper {
+        /* Aspect Ratio Box (16:9) */
+        .video-box {
             position: relative;
             width: 100%;
-            padding-bottom: 56.25%; /* 16:9 Aspect Ratio maintain karega */
+            padding-bottom: 56.25%; /* Creates the 16:9 height automatically */
             background: #000;
         }
 
@@ -78,31 +72,47 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border: none;
+            border: 0;
         }
 
-        /* --- 5. 🛡️ SECURITY MASKS (Har box ke liye apply honge) --- */
+        /* --- 4. 🛡️ PRECISION SECURITY MASKS (Smart Logic) --- */
+        /*
+           Logic: Masks sirf top area me rahenge.
+           Bottom 75% area khula rahega for Play/Pause/Settings/Fullscreen.
+        */
+
         .mask {
             position: absolute;
-            z-index: 20; /* Iframe ke upar */
+            top: 0;
+            height: 25%; /* ⚠️ ONLY covers top 25%. Center/Bottom is free. */
+            z-index: 50; /* Iframe ke upar rahega */
             background: transparent; /* Invisible */
-            /* background: rgba(255,0,0,0.3); /* Debugging ke liye uncomment karein */
+            /* background: rgba(255, 0, 0, 0.3); /* Debug: Uncomment to see the red security zones */
+            cursor: default;
         }
 
-        /* Right Side Mask (Blocks Share Button) */
-        .mask-right {
-            top: 0;
+        /* Top Right: Blocks Share Button & Link text */
+        .mask-share {
             right: 0;
-            width: 20%;
-            height: 60px;
+            width: 40%; /* Thoda choda rakha hai taaki lamba link text bhi cover ho */
         }
 
-        /* Left Side Mask (Blocks Mega Logo) */
-        .mask-left {
-            top: 0;
+        /* Top Left: Blocks MEGA Logo */
+        .mask-logo {
             left: 0;
-            width: 15%;
-            height: 60px;
+            width: 25%;
+        }
+
+        /* Card Title (Optional, very small for 3-col layout) */
+        .card-title {
+            font-size: 9px;
+            padding: 4px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #aaa;
+            background: #0a0a0a;
         }
 
     </style>
@@ -110,107 +120,87 @@
 <body oncontextmenu="return false;">
 
     <header>
-        <h1>My Premium Course</h1>
-        <p>8 Videos • Secure Access</p>
+        <h1>Video Gallery</h1>
+        <p>3-Column Layout • <span class="secure-badge">Secure Mode</span></p>
     </header>
 
-    <div class="gallery-container">
+    <div class="grid-container">
 
         <div class="video-card">
-            <div class="card-header">
-                <span>01. Introduction</span>
-                <span style="color: var(--accent);">▶</span>
+            <div class="video-box">
+                <div class="mask mask-share"></div>
+                <div class="mask mask-logo"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" allowfullscreen></iframe>
             </div>
-            <div class="video-wrapper">
-                <div class="mask mask-right"></div> <div class="mask mask-left"></div>  <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
-            </div>
+            <div class="card-title">1. Intro</div>
         </div>
 
         <div class="video-card">
-            <div class="card-header">
-                <span>02. System Setup</span>
-                <span style="color: var(--accent);">▶</span>
+            <div class="video-box">
+                <div class="mask mask-share"></div>
+                <div class="mask mask-logo"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" allowfullscreen></iframe>
             </div>
-            <div class="video-wrapper">
-                <div class="mask mask-right"></div>
-                <div class="mask mask-left"></div>
-                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
-            </div>
+            <div class="card-title">2. Setup</div>
         </div>
 
         <div class="video-card">
-            <div class="card-header">
-                <span>03. Basic Commands</span>
-                <span style="color: var(--accent);">▶</span>
+            <div class="video-box">
+                <div class="mask mask-share"></div>
+                <div class="mask mask-logo"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" allowfullscreen></iframe>
             </div>
-            <div class="video-wrapper">
-                <div class="mask mask-right"></div>
-                <div class="mask mask-left"></div>
-                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
-            </div>
+            <div class="card-title">3. Basics</div>
         </div>
 
         <div class="video-card">
-            <div class="card-header">
-                <span>04. Network Scanning</span>
-                <span style="color: var(--accent);">▶</span>
+            <div class="video-box">
+                <div class="mask mask-share"></div>
+                <div class="mask mask-logo"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" allowfullscreen></iframe>
             </div>
-            <div class="video-wrapper">
-                <div class="mask mask-right"></div>
-                <div class="mask mask-left"></div>
-                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
-            </div>
+            <div class="card-title">4. Network</div>
         </div>
 
         <div class="video-card">
-            <div class="card-header">
-                <span>05. Vulnerability Analysis</span>
-                <span style="color: var(--accent);">▶</span>
+            <div class="video-box">
+                <div class="mask mask-share"></div>
+                <div class="mask mask-logo"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" allowfullscreen></iframe>
             </div>
-            <div class="video-wrapper">
-                <div class="mask mask-right"></div>
-                <div class="mask mask-left"></div>
-                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
-            </div>
+            <div class="card-title">5. Scanning</div>
         </div>
 
         <div class="video-card">
-            <div class="card-header">
-                <span>06. Web Exploitation</span>
-                <span style="color: var(--accent);">▶</span>
+            <div class="video-box">
+                <div class="mask mask-share"></div>
+                <div class="mask mask-logo"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" allowfullscreen></iframe>
             </div>
-            <div class="video-wrapper">
-                <div class="mask mask-right"></div>
-                <div class="mask mask-left"></div>
-                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
-            </div>
+            <div class="card-title">6. Enum</div>
         </div>
 
         <div class="video-card">
-            <div class="card-header">
-                <span>07. Post Exploitation</span>
-                <span style="color: var(--accent);">▶</span>
+            <div class="video-box">
+                <div class="mask mask-share"></div>
+                <div class="mask mask-logo"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" allowfullscreen></iframe>
             </div>
-            <div class="video-wrapper">
-                <div class="mask mask-right"></div>
-                <div class="mask mask-left"></div>
-                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
-            </div>
+            <div class="card-title">7. Web Hacking</div>
         </div>
 
         <div class="video-card">
-            <div class="card-header">
-                <span>08. Final Review</span>
-                <span style="color: var(--accent);">▶</span>
+            <div class="video-box">
+                <div class="mask mask-share"></div>
+                <div class="mask mask-logo"></div>
+                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM" allowfullscreen></iframe>
             </div>
-            <div class="video-wrapper">
-                <div class="mask mask-right"></div>
-                <div class="mask mask-left"></div>
-                <iframe src="https://mega.nz/embed/iMNSiKKR#fu4kLlopVkzmH_8PYCibG3m2UDHa8PerM5DAiUPErXM"></iframe>
-            </div>
+            <div class="card-title">8. Final</div>
         </div>
 
     </div>
+
+    <div style="height: 50px;"></div>
 
 </body>
 </html>
