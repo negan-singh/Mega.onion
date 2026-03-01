@@ -1,4 +1,4 @@
-name: Daily Repository Views Tracker
+
 
 on:
   # Run once per day at 00:15 UTC.
