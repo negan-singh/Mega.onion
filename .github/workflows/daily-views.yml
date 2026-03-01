@@ -1,0 +1,208 @@
+name: Daily Repository Views Tracker
+
+on:
+  # Run once per day at 00:15 UTC.
+  schedule:
+    - cron: '15 0 * * *'
+  # Allow manual execution from the Actions tab.
+  workflow_dispatch:
+
+# Needed to push commits and open pull requests.
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  collect-daily-views:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Check out repository with full history so branch creation/push is reliable.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Ensure jq is present before JSON parsing.
+      - name: Ensure jq is installed
+        shell: bash
+        run: |
+          set -euo pipefail
+          if ! command -v jq >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y jq
+          fi
+          jq --version
+
+      # Fetch traffic data, extract most recent daily view count, and write it to dated folder/file.
+      - name: Fetch latest daily views and write data file
+        id: views
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${GH_TOKEN:-}" ]]; then
+            echo "Error: GH_TOKEN secret is not set."
+            exit 1
+          fi
+
+          TODAY="$(date -u +%F)"
+          OWNER="${REPOSITORY%/*}"
+          REPO="${REPOSITORY#*/}"
+          API_URL="https://api.github.com/repos/${OWNER}/${REPO}/traffic/views"
+
+          echo "Fetching traffic views from: ${API_URL}"
+          HTTP_CODE="$(curl -sS -w '%{http_code}' -o response.json \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "${API_URL}")"
+
+          # Fail safely if API call did not succeed.
+          if [[ "${HTTP_CODE}" -lt 200 || "${HTTP_CODE}" -ge 300 ]]; then
+            echo "GitHub API request failed with HTTP status ${HTTP_CODE}."
+            echo "Response body:"
+            cat response.json
+            exit 1
+          fi
+
+          # Basic response validation.
+          if ! jq -e '.views and (.views | type == "array") and (.views | length > 0)' response.json >/dev/null; then
+            echo "Error: API response does not contain a non-empty views array."
+            cat response.json
+            exit 1
+          fi
+
+          # Select the most recent entry by timestamp and extract numeric count.
+          VIEW_COUNT="$(jq -r '.views | sort_by(.timestamp) | last | .count' response.json)"
+
+          if ! [[ "${VIEW_COUNT}" =~ ^[0-9]+$ ]]; then
+            echo "Error: Extracted view count is not numeric: ${VIEW_COUNT}"
+            exit 1
+          fi
+
+          DATA_DIR="data/${TODAY}"
+          DATA_FILE="${DATA_DIR}/${TODAY}.txt"
+
+          # Idempotent behavior: create folder if missing; do not overwrite existing file.
+          mkdir -p "${DATA_DIR}"
+          if [[ -f "${DATA_FILE}" ]]; then
+            EXISTING_CONTENT="$(cat "${DATA_FILE}")"
+            if [[ "${EXISTING_CONTENT}" == "${VIEW_COUNT}" ]]; then
+              echo "Data file already exists with same value; no update needed."
+              echo "changed=false" >> "$GITHUB_OUTPUT"
+            else
+              echo "Error: ${DATA_FILE} already exists with different content (${EXISTING_CONTENT})."
+              echo "Refusing to overwrite previous data."
+              exit 1
+            fi
+          else
+            printf '%s\n' "${VIEW_COUNT}" > "${DATA_FILE}"
+            echo "Wrote daily view count ${VIEW_COUNT} to ${DATA_FILE}"
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+          echo "date=${TODAY}" >> "$GITHUB_OUTPUT"
+          echo "view_count=${VIEW_COUNT}" >> "$GITHUB_OUTPUT"
+
+      # Configure git identity as requested.
+      - name: Configure git user
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "mega-.onion"
+          git config user.email "mega-onion-bot@users.noreply.github.com"
+
+      # Create and push dated branch only when file changes were made.
+      - name: Create branch, commit, and push
+        id: commit_push
+        if: steps.views.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TODAY="${{ steps.views.outputs.date }}"
+          BRANCH="daily-views-${TODAY}"
+
+          git checkout -b "${BRANCH}"
+          git add "data/${TODAY}/${TODAY}.txt"
+
+          if git diff --cached --quiet; then
+            echo "No staged changes detected; skipping commit."
+            echo "pushed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          git commit -m "Daily views update for ${TODAY}"
+
+          # Push using token from secret (no hardcoded credentials).
+          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git"
+          git push --set-upstream origin "${BRANCH}"
+
+          echo "branch=${BRANCH}" >> "$GITHUB_OUTPUT"
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # Create PR to main branch after successful push.
+      - name: Create pull request
+        if: steps.commit_push.outputs.pushed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          REPOSITORY: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          TODAY="${{ steps.views.outputs.date }}"
+          VIEW_COUNT="${{ steps.views.outputs.view_count }}"
+          BRANCH="${{ steps.commit_push.outputs.branch }}"
+          API_URL="https://api.github.com/repos/${REPOSITORY}/pulls"
+
+          # Idempotency: if PR for branch already exists, do nothing.
+          EXISTING_PR_COUNT="$(curl -sS \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "https://api.github.com/repos/${REPOSITORY}/pulls?state=open&head=${REPOSITORY%/*}:${BRANCH}" | jq 'length')"
+
+          if [[ "${EXISTING_PR_COUNT}" -gt 0 ]]; then
+            echo "An open PR for branch ${BRANCH} already exists. Skipping PR creation."
+            exit 0
+          fi
+
+          PR_TITLE="Daily Repo Views Update - ${TODAY}"
+          PR_BODY=$(cat <<EOF
+Date: ${TODAY}
+View count: ${VIEW_COUNT}
+
+Automated bot note: This pull request was created automatically by the daily repository views tracking workflow.
+EOF
+)
+
+          PR_PAYLOAD="$(jq -n \
+            --arg title "${PR_TITLE}" \
+            --arg head "${BRANCH}" \
+            --arg base "main" \
+            --arg body "${PR_BODY}" \
+            '{title: $title, head: $head, base: $base, body: $body}')"
+
+          HTTP_CODE="$(curl -sS -w '%{http_code}' -o pr_response.json \
+            -X POST \
+            -H "Authorization: Bearer ${GH_TOKEN}" \
+            -H "Accept: application/vnd.github+json" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            "${API_URL}" \
+            -d "${PR_PAYLOAD}")"
+
+          if [[ "${HTTP_CODE}" -lt 200 || "${HTTP_CODE}" -ge 300 ]]; then
+            echo "Failed to create PR. HTTP status: ${HTTP_CODE}"
+            echo "Response body:"
+            cat pr_response.json
+            exit 1
+          fi
+
+          echo "Pull request created successfully."
