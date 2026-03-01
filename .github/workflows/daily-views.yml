@@ -175,7 +175,7 @@ jobs:
           fi
 
           PR_TITLE="Daily Repo Views Update - ${TODAY}"
-          PR_BODY="Date: ${TODAY}\n\nView count: ${VIEW_COUNT}\n\nAutomated bot note: This pull request was created automatically by the daily repository views tracking workflow."
+
 
           PR_PAYLOAD="$(jq -n \
             --arg title "${PR_TITLE}" \
